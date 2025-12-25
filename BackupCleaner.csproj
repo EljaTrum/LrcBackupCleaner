@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>LightroomBackupCleaner</AssemblyName>
+    <RootNamespace>BackupCleaner</RootNamespace>
+    <Version>1.0.0</Version>
+    <Authors>Photofacts Academy</Authors>
+    <Company>Photofacts Academy</Company>
+    <Description>Adobe Lightroom Classic Backup Cleanup Tool - Beheer en ruim oude catalogus backups automatisch op</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+  </ItemGroup>
+
+</Project>
