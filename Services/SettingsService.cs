@@ -18,7 +18,7 @@ namespace BackupCleaner.Services
         public string? CatalogName { get; set; }
         
         /// <summary>
-        /// Is automatisch opruimen ingeschakeld
+        /// Is automatisch opruimen ingeschakeld (app draait op achtergrond)
         /// </summary>
         public bool AutoCleanupEnabled { get; set; }
         
@@ -26,6 +26,11 @@ namespace BackupCleaner.Services
         /// Tijdstip voor automatische opruiming (uur van de dag, 0-23)
         /// </summary>
         public int AutoCleanupHour { get; set; } = 2;
+        
+        /// <summary>
+        /// Start app bij Windows startup, voer cleanup uit en sluit af
+        /// </summary>
+        public bool RunAtStartup { get; set; }
         
         /// <summary>
         /// Laatste keer dat automatische opruiming is uitgevoerd
@@ -41,6 +46,11 @@ namespace BackupCleaner.Services
         /// Minimum leeftijd in maanden voordat een backup verwijderd mag worden
         /// </summary>
         public int MinimumAgeMonths { get; set; } = 1;
+        
+        /// <summary>
+        /// Taalinstelling: "auto", "nl", of "en"
+        /// </summary>
+        public string Language { get; set; } = "auto";
     }
 
     public static class SettingsService

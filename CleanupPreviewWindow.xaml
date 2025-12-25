@@ -135,6 +135,7 @@
                        FontWeight="SemiBold"/>
             
             <Button Grid.Column="1" 
+                    x:Name="btnCancel"
                     Content="Annuleren" 
                     Click="BtnCancel_Click"
                     Style="{StaticResource SecondaryButtonStyle}"

@@ -2,11 +2,56 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Instellingen - Lightroom Classic Backup Cleaner" 
-        Height="450" Width="550"
+        Height="580" Width="550"
         MinHeight="400" MinWidth="500"
         Background="{StaticResource BackgroundBrush}"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResizeWithGrip">
+    
+    <Window.Resources>
+        <!-- Dark ScrollBar Style -->
+        <Style x:Key="DarkScrollBarThumb" TargetType="Thumb">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border x:Name="thumbBorder"
+                                Background="#505050"
+                                CornerRadius="4"
+                                Margin="2"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="thumbBorder" Property="Background" Value="#686868"/>
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="thumbBorder" Property="Background" Value="#808080"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DarkScrollBar" TargetType="ScrollBar">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Width" Value="12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid>
+                            <Border Background="#2A2A2A" CornerRadius="6"/>
+                            <Track x:Name="PART_Track" IsDirectionReversed="True">
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource DarkScrollBarThumb}"/>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     
     <Grid Margin="24">
         <Grid.RowDefinitions>
@@ -28,19 +73,24 @@
         </StackPanel>
 
         <!-- Settings Content -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,4,0">
+            <ScrollViewer.Resources>
+                <Style TargetType="ScrollBar" BasedOn="{StaticResource DarkScrollBar}"/>
+            </ScrollViewer.Resources>
+            <StackPanel Margin="0,0,8,0">
                 
                 <!-- Automatisch opruimen sectie -->
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
                     <StackPanel>
-                        <TextBlock Text="🕐 Automatisch opruimen" 
+                        <TextBlock x:Name="txtAutoCleanupTitle" 
+                                   Text="🕐 Automatisch opruimen" 
                                    FontSize="16" 
                                    FontWeight="SemiBold" 
                                    Foreground="{StaticResource TextPrimaryBrush}"
                                    Margin="0,0,0,8"/>
                         
-                        <TextBlock Text="Wanneer ingeschakeld, ruimt de applicatie dagelijks automatisch oude Lightroom backups op. De applicatie moet actief zijn (eventueel in de system tray)." 
+                        <TextBlock x:Name="txtAutoCleanupDescription" 
+                                   Text="Wanneer ingeschakeld, ruimt de applicatie dagelijks automatisch oude Lightroom backups op. De applicatie moet actief zijn (eventueel in de system tray)." 
                                    TextWrapping="Wrap"
                                    Foreground="{StaticResource TextSecondaryBrush}"
                                    Margin="0,0,0,16"/>
@@ -56,7 +106,8 @@
                                     Orientation="Horizontal" 
                                     Margin="30,16,0,0"
                                     Visibility="Collapsed">
-                            <TextBlock Text="Opruimen om:" 
+                            <TextBlock x:Name="txtCleanupAtLabel" 
+                                       Text="Opruimen om:" 
                                        VerticalAlignment="Center"
                                        Foreground="{StaticResource TextSecondaryBrush}"
                                        Margin="0,0,12,0"/>
@@ -94,7 +145,8 @@
                                             Cursor="Hand"/>
                                 </StackPanel>
                             </Border>
-                            <TextBlock Text="uur" 
+                            <TextBlock x:Name="txtHourLabel" 
+                                       Text="uur" 
                                        VerticalAlignment="Center"
                                        Foreground="{StaticResource TextSecondaryBrush}"
                                        Margin="8,0,0,0"/>
@@ -119,6 +171,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="💡" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Top"/>
                                 <TextBlock Grid.Column="1" 
+                                           x:Name="txtScheduledTaskInfo"
                                            Text="Een Windows Scheduled Task wordt aangemaakt zodat de opruiming ook werkt als de app niet actief is." 
                                            TextWrapping="Wrap"
                                            Foreground="{StaticResource AccentBrush}"
@@ -128,40 +181,156 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Over sectie -->
-                <Border Style="{StaticResource CardStyle}">
+                <!-- Starten bij Windows sectie -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
                     <StackPanel>
-                        <TextBlock Text="ℹ️ Over deze applicatie" 
+                        <TextBlock x:Name="txtStartupTitle" 
+                                   Text="🚀 Starten bij Windows" 
                                    FontSize="16" 
                                    FontWeight="SemiBold" 
                                    Foreground="{StaticResource TextPrimaryBrush}"
                                    Margin="0,0,0,8"/>
                         
-                        <TextBlock TextWrapping="Wrap"
+                        <TextBlock x:Name="txtStartupDescription" 
+                                   Text="Start de applicatie automatisch wanneer Windows opstart, voer de opruiming uit en sluit daarna weer af. Ideaal als je niet wilt dat de app continu op de achtergrond draait." 
+                                   TextWrapping="Wrap"
                                    Foreground="{StaticResource TextSecondaryBrush}"
-                                   LineHeight="22">
-                            <Run Text="Lightroom Classic Backup Cleaner helpt je oude catalogus backups van Adobe Lightroom Classic automatisch op te ruimen."/>
-                            <LineBreak/><LineBreak/>
-                            <Run Text="De applicatie detecteert automatisch je Lightroom backup locatie en toont alle beschikbare backups. Je kunt instellen hoeveel backups je wilt bewaren en hoe oud een backup minimaal moet zijn voordat deze verwijderd mag worden."/>
-                        </TextBlock>
+                                   Margin="0,0,0,16"/>
+                        
+                        <CheckBox x:Name="chkRunAtStartup" 
+                                  Content="Opruimen bij opstarten van Windows"
+                                  Style="{StaticResource ModernCheckBoxStyle}"
+                                  Checked="ChkRunAtStartup_Changed"
+                                  Unchecked="ChkRunAtStartup_Changed"/>
+                        
+                        <TextBlock x:Name="txtStartupInfo" 
+                                   Text="✓ De app start automatisch, ruimt op en sluit weer af" 
+                                   FontSize="12" 
+                                   Foreground="{StaticResource SuccessBrush}"
+                                   Margin="30,12,0,0"
+                                   Visibility="Collapsed"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Taal sectie -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock x:Name="txtLanguageTitle" 
+                                   Text="🌐 Taal" 
+                                   FontSize="16" 
+                                   FontWeight="SemiBold" 
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,8"/>
+                        
+                        <TextBlock x:Name="txtLanguageDescription" 
+                                   Text="Kies je voorkeurstaal. De app moet opnieuw opstarten om de wijziging toe te passen." 
+                                   TextWrapping="Wrap"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,16"/>
+                        
+                        <StackPanel Margin="0,0,0,8">
+                            <RadioButton x:Name="rbLanguageAuto" 
+                                         GroupName="Language"
+                                         Checked="LanguageOption_Changed"
+                                         Margin="0,4">
+                                <RadioButton.Style>
+                                    <Style TargetType="RadioButton">
+                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                                        <Setter Property="FontSize" Value="14"/>
+                                        <Setter Property="Cursor" Value="Hand"/>
+                                    </Style>
+                                </RadioButton.Style>
+                                <TextBlock x:Name="txtLangAuto" Text="Automatisch (systeemtaal)"/>
+                            </RadioButton>
+                            
+                            <RadioButton x:Name="rbLanguageEnglish" 
+                                         GroupName="Language"
+                                         Checked="LanguageOption_Changed"
+                                         Margin="0,4">
+                                <RadioButton.Style>
+                                    <Style TargetType="RadioButton">
+                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                                        <Setter Property="FontSize" Value="14"/>
+                                        <Setter Property="Cursor" Value="Hand"/>
+                                    </Style>
+                                </RadioButton.Style>
+                                <TextBlock Text="English"/>
+                            </RadioButton>
+                            
+                            <RadioButton x:Name="rbLanguageDutch" 
+                                         GroupName="Language"
+                                         Checked="LanguageOption_Changed"
+                                         Margin="0,4">
+                                <RadioButton.Style>
+                                    <Style TargetType="RadioButton">
+                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                                        <Setter Property="FontSize" Value="14"/>
+                                        <Setter Property="Cursor" Value="Hand"/>
+                                    </Style>
+                                </RadioButton.Style>
+                                <TextBlock Text="Nederlands"/>
+                            </RadioButton>
+                        </StackPanel>
+                        
+                        <TextBlock x:Name="txtLanguageInfo" 
+                                   Text="" 
+                                   FontSize="12" 
+                                   Foreground="{StaticResource WarningBrush}"
+                                   Margin="0,8,0,0"
+                                   Visibility="Collapsed"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Over sectie -->
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <TextBlock x:Name="txtAboutTitle" 
+                                   Text="ℹ️ Over deze applicatie" 
+                                   FontSize="16" 
+                                   FontWeight="SemiBold" 
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,8"/>
+                        
+                        <StackPanel>
+                            <TextBlock x:Name="txtAboutDescription1"
+                                       Text="Lightroom Classic Backup Cleaner helpt je oude catalogus backups van Adobe Lightroom Classic automatisch op te ruimen."
+                                       TextWrapping="Wrap"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       LineHeight="22"/>
+                            <TextBlock x:Name="txtAboutDescription2"
+                                       Text="De applicatie detecteert automatisch je Lightroom backup locatie en toont alle beschikbare backups. Je kunt instellen hoeveel backups je wilt bewaren en hoe oud een backup minimaal moet zijn voordat deze verwijderd mag worden."
+                                       TextWrapping="Wrap"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       LineHeight="22"
+                                       Margin="0,12,0,0"/>
+                        </StackPanel>
                         
                         <Border Background="{StaticResource SecondaryBrush}" 
                                 CornerRadius="6" 
                                 Padding="12" 
                                 Margin="0,16,0,0">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Gemaakt door " 
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock x:Name="txtMadeBy"
+                                               Text="Gemaakt door " 
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="lnkPhotofacts"
+                                               Text="Photofacts Academy" 
+                                               Foreground="{StaticResource AccentBrush}"
+                                               FontWeight="SemiBold"
+                                               Cursor="Hand"
+                                               TextDecorations="Underline"
+                                               MouseLeftButtonDown="PhotofactsLink_Click"
+                                               VerticalAlignment="Center"
+                                               ToolTip="https://photofactsacademy.nl"/>
+                                </StackPanel>
+                                <TextBlock x:Name="txtVersion"
+                                           Text="Versie: 0.1, december 2025" 
                                            Foreground="{StaticResource TextSecondaryBrush}"
-                                           VerticalAlignment="Center"/>
-                                <TextBlock x:Name="lnkPhotofacts"
-                                           Text="Photofacts Academy" 
-                                           Foreground="{StaticResource AccentBrush}"
-                                           FontWeight="SemiBold"
-                                           Cursor="Hand"
-                                           TextDecorations="Underline"
-                                           MouseLeftButtonDown="PhotofactsLink_Click"
-                                           VerticalAlignment="Center"
-                                           ToolTip="https://photofactsacademy.nl"/>
+                                           FontSize="12"
+                                           Margin="0,6,0,0"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -172,7 +341,8 @@
 
         <!-- Footer -->
         <Border Grid.Row="2" Margin="0,16,0,0">
-            <Button Content="Sluiten" 
+            <Button x:Name="btnClose"
+                    Content="Sluiten" 
                     Click="BtnClose_Click"
                     Style="{StaticResource PrimaryButtonStyle}"
                     HorizontalAlignment="Right"

@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter</value>
+  </resheader>
+
+  <!-- Window Titles -->
+  <data name="AppTitle" xml:space="preserve">
+    <value>Lightroom Classic Backup Cleaner</value>
+  </data>
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>Settings - Lightroom Classic Backup Cleaner</value>
+  </data>
+  <data name="PreviewTitle" xml:space="preserve">
+    <value>Backups to Delete - Preview</value>
+  </data>
+
+  <!-- Main Window - Header -->
+  <data name="NoCatalogSelected" xml:space="preserve">
+    <value>No catalog selected</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>⚙️ Settings</value>
+  </data>
+  <data name="ChangeFolder" xml:space="preserve">
+    <value>📁 Change Folder</value>
+  </data>
+
+  <!-- Main Window - Toolbar -->
+  <data name="Refresh" xml:space="preserve">
+    <value>🔄 Refresh</value>
+  </data>
+  <data name="Cleanup" xml:space="preserve">
+    <value>🗑️ Cleanup</value>
+  </data>
+  <data name="MinAge" xml:space="preserve">
+    <value>Min. age:</value>
+  </data>
+  <data name="MinAgeTooltip" xml:space="preserve">
+    <value>Backups younger than this will never be deleted</value>
+  </data>
+  <data name="Months" xml:space="preserve">
+    <value>mo</value>
+  </data>
+  <data name="Keep" xml:space="preserve">
+    <value>Keep:</value>
+  </data>
+  <data name="KeepTooltip" xml:space="preserve">
+    <value>Number of backups to always keep</value>
+  </data>
+
+  <!-- Main Window - List Headers -->
+  <data name="BackupDate" xml:space="preserve">
+    <value>Backup Date</value>
+  </data>
+  <data name="Age" xml:space="preserve">
+    <value>Age</value>
+  </data>
+  <data name="Size" xml:space="preserve">
+    <value>Size</value>
+  </data>
+
+  <!-- Main Window - Status -->
+  <data name="Kept" xml:space="preserve">
+    <value>Kept</value>
+  </data>
+  <data name="Deleted" xml:space="preserve">
+    <value>Deleted</value>
+  </data>
+  <data name="Ready" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total:</value>
+  </data>
+  <data name="Backups" xml:space="preserve">
+    <value>backup(s)</value>
+  </data>
+  <data name="ToDelete" xml:space="preserve">
+    <value>To delete:</value>
+  </data>
+  <data name="SpaceToFree" xml:space="preserve">
+    <value>Space to free:</value>
+  </data>
+  <data name="MadeBy" xml:space="preserve">
+    <value>Made by</value>
+  </data>
+
+  <!-- Main Window - Empty State -->
+  <data name="NoBackupsFound" xml:space="preserve">
+    <value>No backups found</value>
+  </data>
+  <data name="SelectBackupFolder" xml:space="preserve">
+    <value>Select a Lightroom backup folder to start</value>
+  </data>
+  <data name="SelectBackupFolderButton" xml:space="preserve">
+    <value>📁 Select Backup Folder</value>
+  </data>
+  <data name="SearchingBackups" xml:space="preserve">
+    <value>Searching for Lightroom backups...</value>
+  </data>
+
+  <!-- Age Formatting -->
+  <data name="Today" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="Yesterday" xml:space="preserve">
+    <value>Yesterday</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>days</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>day</value>
+  </data>
+  <data name="Weeks" xml:space="preserve">
+    <value>weeks</value>
+  </data>
+  <data name="Week" xml:space="preserve">
+    <value>week</value>
+  </data>
+  <data name="MonthsAge" xml:space="preserve">
+    <value>months</value>
+  </data>
+  <data name="Month" xml:space="preserve">
+    <value>month</value>
+  </data>
+  <data name="Years" xml:space="preserve">
+    <value>years</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>year</value>
+  </data>
+
+  <!-- Settings Window -->
+  <data name="SettingsHeader" xml:space="preserve">
+    <value>⚙️ Settings</value>
+  </data>
+  <data name="ConfigureAutoCleanup" xml:space="preserve">
+    <value>Configure automatic cleanup</value>
+  </data>
+  <data name="AutoCleanupTitle" xml:space="preserve">
+    <value>🕐 Automatic cleanup</value>
+  </data>
+  <data name="AutoCleanupDescription" xml:space="preserve">
+    <value>When enabled, the application will automatically clean up old Lightroom backups daily. The application must be active (or in the system tray).</value>
+  </data>
+  <data name="AutoCleanupCheckbox" xml:space="preserve">
+    <value>Automatic daily cleanup</value>
+  </data>
+  <data name="CleanupAt" xml:space="preserve">
+    <value>Cleanup at:</value>
+  </data>
+  <data name="Hour" xml:space="preserve">
+    <value>hour</value>
+  </data>
+  <data name="ScheduledTaskInfo" xml:space="preserve">
+    <value>A Windows Scheduled Task will be created so cleanup works even when the app is not active.</value>
+  </data>
+
+  <data name="StartupTitle" xml:space="preserve">
+    <value>🚀 Start with Windows</value>
+  </data>
+  <data name="StartupDescription" xml:space="preserve">
+    <value>Start the application automatically when Windows starts, perform cleanup and then close. Ideal if you don't want the app running in the background constantly.</value>
+  </data>
+  <data name="StartupCheckbox" xml:space="preserve">
+    <value>Cleanup at Windows startup</value>
+  </data>
+  <data name="StartupInfo" xml:space="preserve">
+    <value>✓ The app starts automatically, cleans up and closes</value>
+  </data>
+
+  <data name="LanguageTitle" xml:space="preserve">
+    <value>🌐 Language</value>
+  </data>
+  <data name="LanguageDescription" xml:space="preserve">
+    <value>Choose your preferred language. The app will restart to apply the change.</value>
+  </data>
+  <data name="LanguageAuto" xml:space="preserve">
+    <value>Automatic (system language)</value>
+  </data>
+  <data name="LanguageEnglish" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="LanguageDutch" xml:space="preserve">
+    <value>Nederlands</value>
+  </data>
+
+  <data name="AboutTitle" xml:space="preserve">
+    <value>ℹ️ About this application</value>
+  </data>
+  <data name="AboutDescription1" xml:space="preserve">
+    <value>Lightroom Classic Backup Cleaner helps you automatically clean up old catalog backups from Adobe Lightroom Classic.</value>
+  </data>
+  <data name="AboutDescription2" xml:space="preserve">
+    <value>The application automatically detects your Lightroom backup location and shows all available backups. You can set how many backups to keep and how old a backup must be before it can be deleted.</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Version: 0.1, December 2025</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+
+  <!-- Preview Window -->
+  <data name="PreviewHeader" xml:space="preserve">
+    <value>⚠️ Backups to Delete</value>
+  </data>
+  <data name="PreviewSummary" xml:space="preserve">
+    <value>{0} backup(s) - Total: {1} to free</value>
+  </data>
+  <data name="PreviewWarning" xml:space="preserve">
+    <value>Check the backups below before permanently deleting them.</value>
+  </data>
+  <data name="BackupFolder" xml:space="preserve">
+    <value>Backup Folder</value>
+  </data>
+  <data name="CannotBeUndone" xml:space="preserve">
+    <value>🔴 Warning: This action cannot be undone!</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="DeletePermanently" xml:space="preserve">
+    <value>🗑️ Delete Permanently</value>
+  </data>
+  <data name="ConfirmDeleteTitle" xml:space="preserve">
+    <value>Confirmation</value>
+  </data>
+  <data name="ConfirmDeleteMessage" xml:space="preserve">
+    <value>Are you sure you want to permanently delete {0} backup(s)?
+
+This will delete complete backup folders including all files inside.
+
+This action cannot be undone!</value>
+  </data>
+
+  <!-- Messages -->
+  <data name="NoBackupsToDelete" xml:space="preserve">
+    <value>There are no backups selected for deletion.
+
+Adjust the settings (keep more backups or shorter minimum age) if you want to delete more backups.</value>
+  </data>
+  <data name="NoBackupsTitle" xml:space="preserve">
+    <value>No backups</value>
+  </data>
+  <data name="CleanupCompleteTitle" xml:space="preserve">
+    <value>Cleanup complete</value>
+  </data>
+  <data name="CleanupCompleteMessage" xml:space="preserve">
+    <value>{0} backup(s) deleted.
+{1} disk space freed.</value>
+  </data>
+  <data name="CleanupCompleteWithErrorsTitle" xml:space="preserve">
+    <value>Cleanup complete with errors</value>
+  </data>
+  <data name="CleanupCompleteWithErrorsMessage" xml:space="preserve">
+    <value>{0} backup(s) deleted ({1} freed).
+
+There were {2} errors:</value>
+  </data>
+  <data name="InvalidBackupFolder" xml:space="preserve">
+    <value>Invalid backup folder</value>
+  </data>
+  <data name="InvalidBackupFolderMessage" xml:space="preserve">
+    <value>This folder doesn't appear to be a valid Lightroom backup location.
+
+Lightroom backup folders contain subfolders with format 'YYYY-MM-DD HHMM'.
+
+Do you want to use this folder anyway?</value>
+  </data>
+  <data name="FolderNotFound" xml:space="preserve">
+    <value>Folder not found</value>
+  </data>
+  <data name="FolderNotFoundMessage" xml:space="preserve">
+    <value>The backup folder '{0}' no longer exists.
+
+Do you want to select a new folder?</value>
+  </data>
+  <data name="MultipleLocationsFound" xml:space="preserve">
+    <value>Multiple backup locations</value>
+  </data>
+  <data name="MultipleLocationsMessage" xml:space="preserve">
+    <value>Multiple Lightroom backup locations were found:
+
+{0}
+Do you want to use the first location?
+
+Click 'No' to select a folder manually.</value>
+  </data>
+  <data name="SelectFolderDescription" xml:space="preserve">
+    <value>Select the Lightroom backup folder (contains folders with date format)</value>
+  </data>
+  <data name="SelectFirstBackup" xml:space="preserve">
+    <value>Select first backup map</value>
+  </data>
+  <data name="ScanningBackups" xml:space="preserve">
+    <value>Scanning backups...</value>
+  </data>
+  <data name="ScanComplete" xml:space="preserve">
+    <value>Scan complete - {0} backup(s) found</value>
+  </data>
+  <data name="NoBackupsInFolder" xml:space="preserve">
+    <value>This folder contains no Lightroom backup folders</value>
+  </data>
+  <data name="AutoCleanupStarted" xml:space="preserve">
+    <value>Automatic cleanup started...</value>
+  </data>
+  <data name="AutoCleanupComplete" xml:space="preserve">
+    <value>Automatically cleaned: {0} backup(s) deleted ({1})</value>
+  </data>
+  <data name="NoBackupsToClean" xml:space="preserve">
+    <value>Automatic cleanup: no backups to delete</value>
+  </data>
+  <data name="BackgroundRunning" xml:space="preserve">
+    <value>Application is running in the background</value>
+  </data>
+  <data name="CleanupNotification" xml:space="preserve">
+    <value>Cleanup complete</value>
+  </data>
+  <data name="CleanupNotificationMessage" xml:space="preserve">
+    <value>{0} backup(s) deleted, {1} freed</value>
+  </data>
+  <data name="LastCleanup" xml:space="preserve">
+    <value>✓ Last cleanup: {0} today • Next: tomorrow {1}</value>
+  </data>
+  <data name="NextCleanup" xml:space="preserve">
+    <value>⏱ Next cleanup: {0}</value>
+  </data>
+  <data name="TodayAt" xml:space="preserve">
+    <value>today at {0}</value>
+  </data>
+  <data name="TomorrowAt" xml:space="preserve">
+    <value>tomorrow at {0}</value>
+  </data>
+  <data name="OpenFolderTooltip" xml:space="preserve">
+    <value>Click to open folder in Explorer</value>
+  </data>
+</root>
+

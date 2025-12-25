@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using BackupCleaner.Services;
 
 namespace BackupCleaner.Models
 {
@@ -73,18 +74,41 @@ namespace BackupCleaner.Models
             get
             {
                 var days = AgeInDays;
-                if (days == 0) return "Vandaag";
-                if (days == 1) return "Gisteren";
-                if (days < 7) return days == 1 ? "1 dag" : $"{days} dagen";
+                
+                if (days == 0) return LocalizationService.GetString("Today");
+                if (days == 1) return LocalizationService.GetString("Yesterday");
+                
+                if (days < 7)
+                {
+                    var dayWord = days == 1 
+                        ? LocalizationService.GetString("Day") 
+                        : LocalizationService.GetString("Days");
+                    return $"{days} {dayWord}";
+                }
                 
                 var weeks = days / 7;
-                if (days < 30) return weeks == 1 ? "1 week" : $"{weeks} weken";
+                if (days < 30)
+                {
+                    var weekWord = weeks == 1 
+                        ? LocalizationService.GetString("Week") 
+                        : LocalizationService.GetString("Weeks");
+                    return $"{weeks} {weekWord}";
+                }
                 
                 var months = days / 30;
-                if (days < 365) return months == 1 ? "1 maand" : $"{months} maanden";
+                if (days < 365)
+                {
+                    var monthWord = months == 1 
+                        ? LocalizationService.GetString("Month") 
+                        : LocalizationService.GetString("MonthsAge");
+                    return $"{months} {monthWord}";
+                }
                 
                 var years = days / 365;
-                return years == 1 ? "1 jaar" : $"{years} jaar";
+                var yearWord = years == 1 
+                    ? LocalizationService.GetString("Year") 
+                    : LocalizationService.GetString("Years");
+                return $"{years} {yearWord}";
             }
         }
 

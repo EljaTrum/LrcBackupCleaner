@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter</value>
+  </resheader>
+
+  <!-- Window Titles -->
+  <data name="AppTitle" xml:space="preserve">
+    <value>Lightroom Classic Backup Cleaner</value>
+  </data>
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>Instellingen - Lightroom Classic Backup Cleaner</value>
+  </data>
+  <data name="PreviewTitle" xml:space="preserve">
+    <value>Te Verwijderen Backups - Preview</value>
+  </data>
+
+  <!-- Main Window - Header -->
+  <data name="NoCatalogSelected" xml:space="preserve">
+    <value>Geen catalogus geselecteerd</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>⚙️ Instellingen</value>
+  </data>
+  <data name="ChangeFolder" xml:space="preserve">
+    <value>📁 Wijzig Map</value>
+  </data>
+
+  <!-- Main Window - Toolbar -->
+  <data name="Refresh" xml:space="preserve">
+    <value>🔄 Vernieuwen</value>
+  </data>
+  <data name="Cleanup" xml:space="preserve">
+    <value>🗑️ Opruimen</value>
+  </data>
+  <data name="MinAge" xml:space="preserve">
+    <value>Min. leeftijd:</value>
+  </data>
+  <data name="MinAgeTooltip" xml:space="preserve">
+    <value>Backups jonger dan dit worden nooit verwijderd</value>
+  </data>
+  <data name="Months" xml:space="preserve">
+    <value>mnd</value>
+  </data>
+  <data name="Keep" xml:space="preserve">
+    <value>Bewaren:</value>
+  </data>
+  <data name="KeepTooltip" xml:space="preserve">
+    <value>Aantal backups dat altijd bewaard blijft</value>
+  </data>
+
+  <!-- Main Window - List Headers -->
+  <data name="BackupDate" xml:space="preserve">
+    <value>Backup Datum</value>
+  </data>
+  <data name="Age" xml:space="preserve">
+    <value>Leeftijd</value>
+  </data>
+  <data name="Size" xml:space="preserve">
+    <value>Grootte</value>
+  </data>
+
+  <!-- Main Window - Status -->
+  <data name="Kept" xml:space="preserve">
+    <value>Bewaard</value>
+  </data>
+  <data name="Deleted" xml:space="preserve">
+    <value>Verwijderd</value>
+  </data>
+  <data name="Ready" xml:space="preserve">
+    <value>Gereed</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Totaal:</value>
+  </data>
+  <data name="Backups" xml:space="preserve">
+    <value>backup(s)</value>
+  </data>
+  <data name="ToDelete" xml:space="preserve">
+    <value>Te verwijderen:</value>
+  </data>
+  <data name="SpaceToFree" xml:space="preserve">
+    <value>Vrij te maken:</value>
+  </data>
+  <data name="MadeBy" xml:space="preserve">
+    <value>Gemaakt door</value>
+  </data>
+
+  <!-- Main Window - Empty State -->
+  <data name="NoBackupsFound" xml:space="preserve">
+    <value>Geen backups gevonden</value>
+  </data>
+  <data name="SelectBackupFolder" xml:space="preserve">
+    <value>Selecteer een Lightroom backup map om te beginnen</value>
+  </data>
+  <data name="SelectBackupFolderButton" xml:space="preserve">
+    <value>📁 Selecteer Backup Map</value>
+  </data>
+  <data name="SearchingBackups" xml:space="preserve">
+    <value>Zoeken naar Lightroom backups...</value>
+  </data>
+
+  <!-- Age Formatting -->
+  <data name="Today" xml:space="preserve">
+    <value>Vandaag</value>
+  </data>
+  <data name="Yesterday" xml:space="preserve">
+    <value>Gisteren</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>dagen</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>dag</value>
+  </data>
+  <data name="Weeks" xml:space="preserve">
+    <value>weken</value>
+  </data>
+  <data name="Week" xml:space="preserve">
+    <value>week</value>
+  </data>
+  <data name="MonthsAge" xml:space="preserve">
+    <value>maanden</value>
+  </data>
+  <data name="Month" xml:space="preserve">
+    <value>maand</value>
+  </data>
+  <data name="Years" xml:space="preserve">
+    <value>jaren</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>jaar</value>
+  </data>
+
+  <!-- Settings Window -->
+  <data name="SettingsHeader" xml:space="preserve">
+    <value>⚙️ Instellingen</value>
+  </data>
+  <data name="ConfigureAutoCleanup" xml:space="preserve">
+    <value>Configureer automatisch opruimen</value>
+  </data>
+  <data name="AutoCleanupTitle" xml:space="preserve">
+    <value>🕐 Automatisch opruimen</value>
+  </data>
+  <data name="AutoCleanupDescription" xml:space="preserve">
+    <value>Indien ingeschakeld zal de applicatie automatisch dagelijks oude Lightroom backups opruimen. De applicatie moet actief zijn (of in het systeemvak draaien).</value>
+  </data>
+  <data name="AutoCleanupCheckbox" xml:space="preserve">
+    <value>Automatisch dagelijks opruimen</value>
+  </data>
+  <data name="CleanupAt" xml:space="preserve">
+    <value>Opruimen om:</value>
+  </data>
+  <data name="Hour" xml:space="preserve">
+    <value>uur</value>
+  </data>
+  <data name="ScheduledTaskInfo" xml:space="preserve">
+    <value>Er wordt een Windows Scheduled Task aangemaakt zodat opruimen ook werkt als de app niet actief is.</value>
+  </data>
+
+  <data name="StartupTitle" xml:space="preserve">
+    <value>🚀 Starten bij Windows</value>
+  </data>
+  <data name="StartupDescription" xml:space="preserve">
+    <value>Start de applicatie automatisch wanneer Windows opstart, voer de opruiming uit en sluit weer af. Ideaal als je de app niet constant op de achtergrond wilt draaien.</value>
+  </data>
+  <data name="StartupCheckbox" xml:space="preserve">
+    <value>Opruimen bij Windows start</value>
+  </data>
+  <data name="StartupInfo" xml:space="preserve">
+    <value>✓ De app start automatisch, ruimt op en sluit af</value>
+  </data>
+
+  <data name="LanguageTitle" xml:space="preserve">
+    <value>🌐 Taal</value>
+  </data>
+  <data name="LanguageDescription" xml:space="preserve">
+    <value>Kies je voorkeurstaal. De app moet opnieuw opstarten om de wijziging toe te passen.</value>
+  </data>
+  <data name="LanguageAuto" xml:space="preserve">
+    <value>Automatisch (systeemtaal)</value>
+  </data>
+  <data name="LanguageEnglish" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="LanguageDutch" xml:space="preserve">
+    <value>Nederlands</value>
+  </data>
+
+  <data name="AboutTitle" xml:space="preserve">
+    <value>ℹ️ Over deze applicatie</value>
+  </data>
+  <data name="AboutDescription1" xml:space="preserve">
+    <value>Lightroom Classic Backup Cleaner helpt je om automatisch oude catalogus backups van Adobe Lightroom Classic op te ruimen.</value>
+  </data>
+  <data name="AboutDescription2" xml:space="preserve">
+    <value>De applicatie detecteert automatisch je Lightroom backup locatie en toont alle beschikbare backups. Je kunt instellen hoeveel backups je wilt bewaren en hoe oud een backup moet zijn voordat deze verwijderd mag worden.</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Versie: 0.1, december 2025</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Sluiten</value>
+  </data>
+
+  <!-- Preview Window -->
+  <data name="PreviewHeader" xml:space="preserve">
+    <value>⚠️ Te Verwijderen Backups</value>
+  </data>
+  <data name="PreviewSummary" xml:space="preserve">
+    <value>{0} backup(s) - Totaal: {1} vrij te maken</value>
+  </data>
+  <data name="PreviewWarning" xml:space="preserve">
+    <value>Controleer onderstaande backups voordat je ze definitief verwijdert.</value>
+  </data>
+  <data name="BackupFolder" xml:space="preserve">
+    <value>Backup Map</value>
+  </data>
+  <data name="CannotBeUndone" xml:space="preserve">
+    <value>🔴 Let op: Deze actie kan niet ongedaan gemaakt worden!</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Annuleren</value>
+  </data>
+  <data name="DeletePermanently" xml:space="preserve">
+    <value>🗑️ Definitief Verwijderen</value>
+  </data>
+  <data name="ConfirmDeleteTitle" xml:space="preserve">
+    <value>Bevestiging</value>
+  </data>
+  <data name="ConfirmDeleteMessage" xml:space="preserve">
+    <value>Weet je zeker dat je {0} backup(s) definitief wilt verwijderen?
+
+Dit verwijdert complete backup mappen inclusief alle bestanden erin.
+
+Deze actie kan niet ongedaan gemaakt worden!</value>
+  </data>
+
+  <!-- Messages -->
+  <data name="NoBackupsToDelete" xml:space="preserve">
+    <value>Er zijn geen backups geselecteerd voor verwijdering.
+
+Pas de instellingen aan (meer backups bewaren of kortere minimale leeftijd) als je meer backups wilt kunnen verwijderen.</value>
+  </data>
+  <data name="NoBackupsTitle" xml:space="preserve">
+    <value>Geen backups</value>
+  </data>
+  <data name="CleanupCompleteTitle" xml:space="preserve">
+    <value>Opruimen voltooid</value>
+  </data>
+  <data name="CleanupCompleteMessage" xml:space="preserve">
+    <value>{0} backup(s) verwijderd.
+{1} schijfruimte vrijgemaakt.</value>
+  </data>
+  <data name="CleanupCompleteWithErrorsTitle" xml:space="preserve">
+    <value>Opruimen voltooid met fouten</value>
+  </data>
+  <data name="CleanupCompleteWithErrorsMessage" xml:space="preserve">
+    <value>{0} backup(s) verwijderd ({1} vrijgemaakt).
+
+Er waren {2} fouten:</value>
+  </data>
+  <data name="InvalidBackupFolder" xml:space="preserve">
+    <value>Ongeldige backup map</value>
+  </data>
+  <data name="InvalidBackupFolderMessage" xml:space="preserve">
+    <value>Deze map lijkt geen geldige Lightroom backup locatie te zijn.
+
+Lightroom backup mappen bevatten submappen met formaat 'YYYY-MM-DD HHMM'.
+
+Wil je deze map toch gebruiken?</value>
+  </data>
+  <data name="FolderNotFound" xml:space="preserve">
+    <value>Map niet gevonden</value>
+  </data>
+  <data name="FolderNotFoundMessage" xml:space="preserve">
+    <value>De backup map '{0}' bestaat niet meer.
+
+Wil je een nieuwe map selecteren?</value>
+  </data>
+  <data name="MultipleLocationsFound" xml:space="preserve">
+    <value>Meerdere backup locaties</value>
+  </data>
+  <data name="MultipleLocationsMessage" xml:space="preserve">
+    <value>Er zijn meerdere Lightroom backup locaties gevonden:
+
+{0}
+Wil je de eerste locatie gebruiken?
+
+Klik 'Nee' om handmatig een map te selecteren.</value>
+  </data>
+  <data name="SelectFolderDescription" xml:space="preserve">
+    <value>Selecteer de Lightroom backup map (bevat mappen met datumformaat)</value>
+  </data>
+  <data name="SelectFirstBackup" xml:space="preserve">
+    <value>Selecteer eerste backup map</value>
+  </data>
+  <data name="ScanningBackups" xml:space="preserve">
+    <value>Backups scannen...</value>
+  </data>
+  <data name="ScanComplete" xml:space="preserve">
+    <value>Scan voltooid - {0} backup(s) gevonden</value>
+  </data>
+  <data name="NoBackupsInFolder" xml:space="preserve">
+    <value>Deze map bevat geen Lightroom backup mappen</value>
+  </data>
+  <data name="AutoCleanupStarted" xml:space="preserve">
+    <value>Automatisch opruimen gestart...</value>
+  </data>
+  <data name="AutoCleanupComplete" xml:space="preserve">
+    <value>Automatisch opgeruimd: {0} backup(s) verwijderd ({1})</value>
+  </data>
+  <data name="NoBackupsToClean" xml:space="preserve">
+    <value>Automatisch opruimen: geen backups om te verwijderen</value>
+  </data>
+  <data name="BackgroundRunning" xml:space="preserve">
+    <value>Applicatie draait op de achtergrond</value>
+  </data>
+  <data name="CleanupNotification" xml:space="preserve">
+    <value>Opruimen voltooid</value>
+  </data>
+  <data name="CleanupNotificationMessage" xml:space="preserve">
+    <value>{0} backup(s) verwijderd, {1} vrijgemaakt</value>
+  </data>
+  <data name="LastCleanup" xml:space="preserve">
+    <value>✓ Laatste opruiming: {0} vandaag • Volgende: morgen {1}</value>
+  </data>
+  <data name="NextCleanup" xml:space="preserve">
+    <value>⏱ Volgende opruiming: {0}</value>
+  </data>
+  <data name="TodayAt" xml:space="preserve">
+    <value>vandaag om {0}</value>
+  </data>
+  <data name="TomorrowAt" xml:space="preserve">
+    <value>morgen om {0}</value>
+  </data>
+  <data name="OpenFolderTooltip" xml:space="preserve">
+    <value>Klik om de map te openen in Verkenner</value>
+  </data>
+</root>
+

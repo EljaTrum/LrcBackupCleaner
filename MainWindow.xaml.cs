@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Forms;
 using BackupCleaner.Models;
 using BackupCleaner.Services;
+using Microsoft.Win32;
 using MessageBox = System.Windows.MessageBox;
 using Application = System.Windows.Application;
 
@@ -22,6 +23,9 @@ namespace BackupCleaner
         private System.Windows.Threading.DispatcherTimer? _autoCleanupTimer;
         private bool _isScanning = false;
         private NotifyIcon? _notifyIcon;
+        
+        private const string StartupRegistryKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
+        private const string StartupValueName = "LightroomClassicBackupCleaner";
 
         public MainWindow()
         {
@@ -30,22 +34,83 @@ namespace BackupCleaner
             lstBackups.ItemsSource = _backups;
             
             LoadSettings();
+            ApplyLocalization();
             SetupAutoCleanupTimer();
             SetupSystemTray();
             
-            // Check voor command line argument voor scheduled task
+            // Check voor command line argument voor startup cleanup
             var args = Environment.GetCommandLineArgs();
-            if (args.Contains("--auto-cleanup"))
+            _isAutoCleanupMode = args.Contains("--auto-cleanup");
+            
+            if (_isAutoCleanupMode)
             {
+                LogStartupCleanup("App gestart in auto-cleanup mode");
+                // Start verborgen voor auto-cleanup
                 WindowState = WindowState.Minimized;
-                Hide();
-                _ = PerformAutomaticCleanupAsync();
+                ShowInTaskbar = false;
             }
-            else
+            
+            // ContentRendered event werkt betrouwbaarder dan Loaded
+            ContentRendered += async (s, e) =>
             {
-                // Normale startup - check backup locatie
-                _ = InitializeBackupLocationAsync();
-            }
+                if (_isAutoCleanupMode)
+                {
+                    LogStartupCleanup("ContentRendered - start cleanup");
+                    // Verberg direct na renderen
+                    Hide();
+                    await PerformStartupCleanupAsync();
+                }
+                else
+                {
+                    await InitializeBackupLocationAsync();
+                }
+            };
+        }
+        
+        private bool _isAutoCleanupMode = false;
+        
+        private void ApplyLocalization()
+        {
+            // Window title blijft Engels (productnaam)
+            Title = LocalizationService.GetString("AppTitle");
+            
+            // Header buttons
+            btnSettings.Content = LocalizationService.GetString("Settings");
+            btnChangeFolder.Content = LocalizationService.GetString("ChangeFolder");
+            
+            // Toolbar buttons
+            btnScan.Content = LocalizationService.GetString("Refresh");
+            btnCleanup.Content = LocalizationService.GetString("Cleanup");
+            
+            // Toolbar labels
+            txtMinAgeLabel.Text = LocalizationService.GetString("MinAge");
+            txtMinAgeLabel.ToolTip = LocalizationService.GetString("MinAgeTooltip");
+            txtMonthsLabel.Text = LocalizationService.GetString("Months");
+            txtKeepLabel.Text = LocalizationService.GetString("Keep");
+            txtKeepLabel.ToolTip = LocalizationService.GetString("KeepTooltip");
+            
+            // List headers
+            txtHeaderBackupDate.Text = LocalizationService.GetString("BackupDate");
+            txtHeaderAge.Text = LocalizationService.GetString("Age");
+            txtHeaderSize.Text = LocalizationService.GetString("Size");
+            
+            // Empty state
+            btnEmptySelectFolder.Content = LocalizationService.GetString("SelectBackupFolderButton");
+            txtEmptyTitle.Text = LocalizationService.GetString("NoBackupsFound");
+            txtEmptySubtitle.Text = LocalizationService.GetString("SelectBackupFolder");
+            
+            // Searching state
+            txtSearchingMessage.Text = LocalizationService.GetString("SearchingBackups");
+            
+            // Status bar
+            txtStatus.Text = LocalizationService.GetString("Ready");
+            txtMadeByLabel.Text = LocalizationService.GetString("MadeBy") + " ";
+            txtTotalLabel.Text = LocalizationService.GetString("Total") + " ";
+            txtToDeleteLabel.Text = LocalizationService.GetString("ToDelete") + " ";
+            txtSpaceLabel.Text = LocalizationService.GetString("SpaceToFree") + " ";
+            
+            // Catalog info tooltip
+            txtCatalogInfo.ToolTip = LocalizationService.GetString("OpenFolderTooltip");
         }
 
         private async Task InitializeBackupLocationAsync()
@@ -61,7 +126,7 @@ namespace BackupCleaner
             }
 
             // Probeer automatisch te detecteren
-            txtStatus.Text = "Zoeken naar Lightroom backups...";
+            txtStatus.Text = LocalizationService.GetString("SearchingBackups");
             searchingState.Visibility = Visibility.Visible;
             emptyState.Visibility = Visibility.Collapsed;
 
@@ -90,23 +155,25 @@ namespace BackupCleaner
             {
                 // Geen locaties gevonden - toon empty state
                 emptyState.Visibility = Visibility.Visible;
-                txtEmptyTitle.Text = "Geen Lightroom backups gevonden";
-                txtEmptySubtitle.Text = "Selecteer handmatig een Lightroom backup map";
-                txtStatus.Text = "Geen backup locatie gevonden";
+                txtEmptyTitle.Text = LocalizationService.GetString("NoBackupsFound");
+                txtEmptySubtitle.Text = LocalizationService.GetString("SelectBackupFolder");
+                txtStatus.Text = LocalizationService.GetString("NoBackupsFound");
             }
         }
 
         private void ShowBackupLocationChoice(List<string> locations)
         {
-            var message = "Er zijn meerdere Lightroom backup locaties gevonden:\n\n";
+            var locationsList = "";
             for (int i = 0; i < locations.Count; i++)
             {
                 var catalogName = LightroomDetectionService.GetCatalogNameFromBackupPath(locations[i]);
-                message += $"{i + 1}. {catalogName}\n   {locations[i]}\n\n";
+                locationsList += $"{i + 1}. {catalogName}\n   {locations[i]}\n\n";
             }
-            message += "Wil je de eerste locatie gebruiken?\n\nKlik 'Nee' om zelf een map te selecteren.";
+            
+            var message = LocalizationService.GetString("MultipleLocationsMessage", locationsList);
+            var title = LocalizationService.GetString("MultipleLocationsFound");
 
-            var result = MessageBox.Show(message, "Meerdere backup locaties", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var result = MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question);
             
             if (result == MessageBoxResult.Yes)
             {
@@ -132,7 +199,7 @@ namespace BackupCleaner
             }
             else
             {
-                txtCatalogInfo.Text = "Geen catalogus geselecteerd";
+                txtCatalogInfo.Text = LocalizationService.GetString("NoCatalogSelected");
             }
         }
 
@@ -153,10 +220,16 @@ namespace BackupCleaner
                 System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
             
             var contextMenu = new ContextMenuStrip();
-            contextMenu.Items.Add("Openen", null, (s, e) => ShowWindow());
-            contextMenu.Items.Add("Opruimen starten", null, async (s, e) => await PerformAutomaticCleanupAsync());
+            
+            // Tray menu items - lokaliseren
+            var openText = LocalizationService.IsDutch ? "Openen" : "Open";
+            var cleanupText = LocalizationService.IsDutch ? "Opruimen starten" : "Start Cleanup";
+            var exitText = LocalizationService.IsDutch ? "Afsluiten" : "Exit";
+            
+            contextMenu.Items.Add(openText, null, (s, e) => ShowWindow());
+            contextMenu.Items.Add(cleanupText, null, async (s, e) => await PerformAutomaticCleanupAsync());
             contextMenu.Items.Add("-");
-            contextMenu.Items.Add("Afsluiten", null, (s, e) => ExitApplication());
+            contextMenu.Items.Add(exitText, null, (s, e) => ExitApplication());
             
             _notifyIcon.ContextMenuStrip = contextMenu;
             _notifyIcon.DoubleClick += (s, e) => ShowWindow();
@@ -185,7 +258,7 @@ namespace BackupCleaner
                 Hide();
                 _notifyIcon!.Visible = true;
                 _notifyIcon.ShowBalloonTip(2000, "Lightroom Classic Backup Cleaner", 
-                    "Applicatie draait in de achtergrond", ToolTipIcon.Info);
+                    LocalizationService.GetString("BackgroundRunning"), ToolTipIcon.Info);
             }
         }
 
@@ -224,6 +297,92 @@ namespace BackupCleaner
             await PerformAutomaticCleanupAsync();
         }
 
+        /// <summary>
+        /// Voert cleanup uit bij Windows startup en sluit dan af
+        /// </summary>
+        private async Task PerformStartupCleanupAsync()
+        {
+            LogStartupCleanup("PerformStartupCleanupAsync gestart");
+            
+            // Kleine vertraging om zeker te zijn dat alles geladen is
+            await Task.Delay(500);
+            
+            if (string.IsNullOrEmpty(_settings.BackupFolderPath) || 
+                !Directory.Exists(_settings.BackupFolderPath))
+            {
+                // Geen geldige backup map - sluit af
+                LogStartupCleanup("Geen geldige backup map gevonden, afsluiten");
+                ExitApplication();
+                return;
+            }
+
+            try
+            {
+                LogStartupCleanup($"Start cleanup voor: {_settings.BackupFolderPath}");
+                
+                // Scan backups
+                var allBackups = await Task.Run(() => 
+                    BackupService.GetLightroomBackups(_settings.BackupFolderPath!));
+                
+                LogStartupCleanup($"Gevonden backups: {allBackups.Count}");
+                
+                // Bepaal welke te verwijderen
+                var backupsToDelete = BackupService.GetBackupsToDelete(
+                    allBackups, 
+                    _settings.BackupsToKeep, 
+                    _settings.MinimumAgeMonths);
+
+                LogStartupCleanup($"Te verwijderen: {backupsToDelete.Count} (bewaren: {_settings.BackupsToKeep}, min leeftijd: {_settings.MinimumAgeMonths} maanden)");
+
+                if (backupsToDelete.Any())
+                {
+                    var (deleted, freed, errors) = await Task.Run(() => BackupService.DeleteBackups(backupsToDelete));
+                    LogStartupCleanup($"Verwijderd: {deleted} backups, {freed} bytes vrijgemaakt, {errors.Count} fouten");
+                }
+                else
+                {
+                    LogStartupCleanup("Geen backups om te verwijderen");
+                }
+
+                _settings.LastAutoCleanup = DateTime.Now;
+                SaveSettings();
+            }
+            catch (Exception ex)
+            {
+                LogStartupCleanup($"Fout: {ex.Message}");
+            }
+            finally
+            {
+                // Altijd afsluiten na startup cleanup
+                LogStartupCleanup("Cleanup voltooid, afsluiten");
+                ExitApplication();
+            }
+        }
+        
+        private static void LogStartupCleanup(string message)
+        {
+            try
+            {
+                var logPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "LightroomBackupCleaner",
+                    "startup-cleanup.log");
+                
+                var directory = Path.GetDirectoryName(logPath);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+                
+                var logLine = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}\n";
+                File.AppendAllText(logPath, logLine);
+            }
+            catch
+            {
+                // Negeer logging fouten
+            }
+        }
+
         private async Task PerformAutomaticCleanupAsync()
         {
             if (string.IsNullOrEmpty(_settings.BackupFolderPath) || 
@@ -232,7 +391,7 @@ namespace BackupCleaner
 
             try
             {
-                txtStatus.Text = "Automatische opruiming gestart...";
+                txtStatus.Text = LocalizationService.GetString("AutoCleanupStarted");
                 
                 // Scan backups
                 var allBackups = await Task.Run(() => 
@@ -249,18 +408,19 @@ namespace BackupCleaner
                     var (deleted, freed, errors) = await Task.Run(() => 
                         BackupService.DeleteBackups(backupsToDelete));
                     
-                    txtStatus.Text = $"Automatisch opgeruimd: {deleted} backup(s) verwijderd ({FormatBytes(freed)})";
+                    txtStatus.Text = LocalizationService.GetString("AutoCleanupComplete", deleted, FormatBytes(freed));
                     
                     if (_notifyIcon != null && _notifyIcon.Visible)
                     {
-                        _notifyIcon.ShowBalloonTip(3000, "Opruiming voltooid",
-                            $"{deleted} backup(s) verwijderd, {FormatBytes(freed)} vrijgemaakt",
+                        _notifyIcon.ShowBalloonTip(3000, 
+                            LocalizationService.GetString("CleanupNotification"),
+                            LocalizationService.GetString("CleanupNotificationMessage", deleted, FormatBytes(freed)),
                             errors.Any() ? ToolTipIcon.Warning : ToolTipIcon.Info);
                     }
                 }
                 else
                 {
-                    txtStatus.Text = "Automatische opruiming: geen backups om te verwijderen";
+                    txtStatus.Text = LocalizationService.GetString("NoBackupsToClean");
                 }
 
                 _settings.LastAutoCleanup = DateTime.Now;
@@ -271,7 +431,9 @@ namespace BackupCleaner
             }
             catch (Exception ex)
             {
-                txtStatus.Text = $"Automatische opruiming mislukt: {ex.Message}";
+                txtStatus.Text = LocalizationService.IsDutch 
+                    ? $"Automatische opruiming mislukt: {ex.Message}"
+                    : $"Automatic cleanup failed: {ex.Message}";
             }
         }
 
@@ -284,7 +446,7 @@ namespace BackupCleaner
         {
             using var dialog = new FolderBrowserDialog
             {
-                Description = "Selecteer de Lightroom backup map (bevat mappen met datum formaat)",
+                Description = LocalizationService.GetString("SelectFolderDescription"),
                 UseDescriptionForTitle = true,
                 ShowNewFolderButton = false
             };
@@ -301,10 +463,8 @@ namespace BackupCleaner
                 if (!LightroomDetectionService.IsValidBackupFolder(dialog.SelectedPath))
                 {
                     var result = MessageBox.Show(
-                        "Deze map lijkt geen geldige Lightroom backup locatie te zijn.\n\n" +
-                        "Lightroom backup mappen bevatten submappen met formaat 'YYYY-MM-DD HHMM'.\n\n" +
-                        "Wil je deze map toch gebruiken?",
-                        "Ongeldige backup map",
+                        LocalizationService.GetString("InvalidBackupFolderMessage"),
+                        LocalizationService.GetString("InvalidBackupFolder"),
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Warning);
                     
@@ -340,6 +500,17 @@ namespace BackupCleaner
                 SaveSettings();
             };
             
+            settingsWindow.RunAtStartupChanged += (s, args) =>
+            {
+                UpdateStartupRegistry();
+                SaveSettings();
+            };
+            
+            settingsWindow.LanguageChanged += (s, newLanguage) =>
+            {
+                SaveSettings();
+            };
+            
             settingsWindow.ShowDialog();
         }
 
@@ -357,7 +528,7 @@ namespace BackupCleaner
                 !Directory.Exists(_settings.BackupFolderPath))
             {
                 emptyState.Visibility = Visibility.Visible;
-                txtStatus.Text = "Selecteer eerst een backup map";
+                txtStatus.Text = LocalizationService.GetString("SelectBackupFolder");
                 return;
             }
 
@@ -367,7 +538,7 @@ namespace BackupCleaner
             emptyState.Visibility = Visibility.Collapsed;
             searchingState.Visibility = Visibility.Collapsed;
             
-            txtStatus.Text = "Backups scannen...";
+            txtStatus.Text = LocalizationService.GetString("ScanningBackups");
             _backups.Clear();
 
             try
@@ -378,9 +549,9 @@ namespace BackupCleaner
                 if (!allBackups.Any())
                 {
                     emptyState.Visibility = Visibility.Visible;
-                    txtEmptyTitle.Text = "Geen backups gevonden";
-                    txtEmptySubtitle.Text = "Deze map bevat geen Lightroom backup mappen";
-                    txtStatus.Text = "Geen backups in geselecteerde map";
+                    txtEmptyTitle.Text = LocalizationService.GetString("NoBackupsFound");
+                    txtEmptySubtitle.Text = LocalizationService.GetString("NoBackupsInFolder");
+                    txtStatus.Text = LocalizationService.GetString("NoBackupsInFolder");
                     UpdateStats();
                     return;
                 }
@@ -402,13 +573,14 @@ namespace BackupCleaner
                 }
 
                 UpdateStats();
-                txtStatus.Text = $"Scan voltooid - {allBackups.Count} backup(s) gevonden";
+                txtStatus.Text = LocalizationService.GetString("ScanComplete", allBackups.Count);
             }
             catch (Exception ex)
             {
-                txtStatus.Text = $"Fout bij scannen: {ex.Message}";
+                var errorTitle = LocalizationService.IsDutch ? "Fout bij scannen" : "Error during scan";
+                txtStatus.Text = $"{errorTitle}: {ex.Message}";
                 emptyState.Visibility = Visibility.Visible;
-                txtEmptyTitle.Text = "Fout bij scannen";
+                txtEmptyTitle.Text = errorTitle;
                 txtEmptySubtitle.Text = ex.Message;
             }
             finally
@@ -437,10 +609,8 @@ namespace BackupCleaner
             if (!backupsToDelete.Any())
             {
                 MessageBox.Show(
-                    "Er zijn geen backups geselecteerd om te verwijderen.\n\n" +
-                    "Pas de instellingen aan (meer backups bewaren of kortere minimale leeftijd) " +
-                    "als je meer backups wilt verwijderen.",
-                    "Geen backups", 
+                    LocalizationService.GetString("NoBackupsToDelete"),
+                    LocalizationService.GetString("NoBackupsTitle"), 
                     MessageBoxButton.OK, 
                     MessageBoxImage.Information);
                 return;
@@ -460,18 +630,18 @@ namespace BackupCleaner
                 
                 if (errors.Any())
                 {
+                    var errorList = string.Join("\n", errors.Take(5));
                     MessageBox.Show(
-                        $"Er zijn {deleted} backup(s) verwijderd ({FormatBytes(freed)} vrijgemaakt).\n\n" +
-                        $"Er waren {errors.Count} fouten:\n{string.Join("\n", errors.Take(5))}",
-                        "Opruimen voltooid met fouten",
+                        LocalizationService.GetString("CleanupCompleteWithErrorsMessage", deleted, FormatBytes(freed), errors.Count) + "\n" + errorList,
+                        LocalizationService.GetString("CleanupCompleteWithErrorsTitle"),
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
                 }
                 else
                 {
                     MessageBox.Show(
-                        $"Er zijn {deleted} backup(s) verwijderd.\n{FormatBytes(freed)} schijfruimte vrijgemaakt.",
-                        "Opruimen voltooid",
+                        LocalizationService.GetString("CleanupCompleteMessage", deleted, FormatBytes(freed)),
+                        LocalizationService.GetString("CleanupCompleteTitle"),
                         MessageBoxButton.OK,
                         MessageBoxImage.Information);
                 }
@@ -589,6 +759,25 @@ namespace BackupCleaner
             }
         }
 
+        private void CatalogInfo_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(_settings.BackupFolderPath) && Directory.Exists(_settings.BackupFolderPath))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = _settings.BackupFolderPath,
+                        UseShellExecute = true
+                    });
+                }
+                catch
+                {
+                    // Negeer fouten bij openen van map
+                }
+            }
+        }
+
         #region Windows Task Scheduler
 
         private void UpdateScheduledTask()
@@ -666,6 +855,38 @@ Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Se
             catch
             {
                 // Silently fail
+            }
+        }
+
+        #endregion
+
+        #region Windows Startup Registry
+
+        private void UpdateStartupRegistry()
+        {
+            try
+            {
+                using var key = Registry.CurrentUser.OpenSubKey(StartupRegistryKey, writable: true);
+                if (key == null) return;
+
+                if (_settings.RunAtStartup)
+                {
+                    var exePath = Process.GetCurrentProcess().MainModule?.FileName;
+                    if (!string.IsNullOrEmpty(exePath))
+                    {
+                        // Voeg toe aan startup met --auto-cleanup argument
+                        key.SetValue(StartupValueName, $"\"{exePath}\" --auto-cleanup");
+                    }
+                }
+                else
+                {
+                    // Verwijder uit startup
+                    key.DeleteValue(StartupValueName, throwOnMissingValue: false);
+                }
+            }
+            catch
+            {
+                // Silently fail bij registry fouten
             }
         }
 

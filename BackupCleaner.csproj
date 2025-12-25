@@ -8,15 +8,24 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>LightroomBackupCleaner</AssemblyName>
     <RootNamespace>BackupCleaner</RootNamespace>
-    <Version>1.0.0</Version>
+    <Version>0.1.0</Version>
     <Authors>Photofacts Academy</Authors>
     <Company>Photofacts Academy</Company>
     <Description>Adobe Lightroom Classic Backup Cleanup Tool - Beheer en ruim oude catalogus backups automatisch op</Description>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    
+    <!-- Single-file publishing opties -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
   </ItemGroup>
+
 
 </Project>

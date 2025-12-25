@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using BackupCleaner.Models;
+using BackupCleaner.Services;
 
 namespace BackupCleaner
 {
@@ -14,11 +15,23 @@ namespace BackupCleaner
             InitializeComponent();
             _filesToDelete = filesToDelete;
             
+            // Stel het venster icoon in (zelfde als hoofdvenster)
+            var appIcon = IconGenerator.CreateAppIcon();
+            Icon = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                appIcon.Handle,
+                System.Windows.Int32Rect.Empty,
+                System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+            
             lstFiles.ItemsSource = _filesToDelete.OrderBy(f => f.BackupDate);
             
             var totalSize = _filesToDelete.Sum(f => f.Size);
             
-            txtSummary.Text = $"{_filesToDelete.Count} backup(s) - Totaal: {FormatBytes(totalSize)} vrij te maken";
+            // Pas lokalisatie toe
+            Title = LocalizationService.GetString("PreviewTitle");
+            txtSummary.Text = LocalizationService.GetString("PreviewSummary", _filesToDelete.Count, FormatBytes(totalSize));
+            txtWarning.Text = LocalizationService.GetString("CannotBeUndone");
+            btnCancel.Content = LocalizationService.GetString("Cancel");
+            btnConfirm.Content = LocalizationService.GetString("DeletePermanently");
         }
 
         private static string FormatBytes(long bytes)
@@ -42,19 +55,9 @@ namespace BackupCleaner
 
         private void BtnConfirm_Click(object sender, RoutedEventArgs e)
         {
-            var result = MessageBox.Show(
-                $"Weet je zeker dat je {_filesToDelete.Count} backup(s) definitief wilt verwijderen?\n\n" +
-                "Dit verwijdert de complete backup mappen inclusief alle bestanden erin.\n\n" +
-                "Deze actie kan niet ongedaan worden gemaakt!",
-                "Bevestiging",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
-                
-            if (result == MessageBoxResult.Yes)
-            {
-                DialogResult = true;
-                Close();
-            }
+            // Direct bevestigen - het preview venster zelf is al de controle
+            DialogResult = true;
+            Close();
         }
     }
 }
