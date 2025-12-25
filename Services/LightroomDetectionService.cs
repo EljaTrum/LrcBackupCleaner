@@ -292,6 +292,157 @@ namespace BackupCleaner.Services
                 return "Lightroom Catalogus";
             }
         }
+
+        /// <summary>
+        /// Zoek naar "Old Lightroom Catalogs" map nabij de backup locatie
+        /// </summary>
+        public static OldCatalogsInfo? FindOldLightroomCatalogs(string backupPath)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(backupPath) || !Directory.Exists(backupPath))
+                    return null;
+
+                // Zoek in de parent directories van de backup map
+                var searchPaths = new List<string>();
+                
+                var parent = Directory.GetParent(backupPath);
+                while (parent != null)
+                {
+                    searchPaths.Add(parent.FullName);
+                    parent = Directory.GetParent(parent.FullName);
+                    
+                    // Maximaal 3 niveaus omhoog
+                    if (searchPaths.Count >= 3) break;
+                }
+                
+                // Zoek ook in dezelfde map als de catalogus
+                foreach (var searchPath in searchPaths)
+                {
+                    try
+                    {
+                        var oldCatalogsPath = Path.Combine(searchPath, "Old Lightroom Catalogs");
+                        if (Directory.Exists(oldCatalogsPath))
+                        {
+                            var info = AnalyzeOldCatalogsFolder(oldCatalogsPath);
+                            if (info != null)
+                                return info;
+                        }
+                    }
+                    catch
+                    {
+                        // Toegangsfout negeren
+                    }
+                }
+
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Analyseer de "Old Lightroom Catalogs" map
+        /// </summary>
+        private static OldCatalogsInfo? AnalyzeOldCatalogsFolder(string path)
+        {
+            try
+            {
+                var files = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
+                if (files.Length == 0)
+                    return null;
+
+                long totalSize = 0;
+                DateTime oldestFile = DateTime.Now;
+                int fileCount = 0;
+
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        var fileInfo = new FileInfo(file);
+                        totalSize += fileInfo.Length;
+                        fileCount++;
+                        
+                        if (fileInfo.LastWriteTime < oldestFile)
+                            oldestFile = fileInfo.LastWriteTime;
+                    }
+                    catch
+                    {
+                        // Negeer individuele bestandsfouten
+                    }
+                }
+
+                if (fileCount == 0)
+                    return null;
+
+                return new OldCatalogsInfo
+                {
+                    FolderPath = path,
+                    TotalSize = totalSize,
+                    FileCount = fileCount,
+                    OldestFileDate = oldestFile,
+                    AgeInDays = (int)(DateTime.Now - oldestFile).TotalDays
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Informatie over "Old Lightroom Catalogs" map
+    /// </summary>
+    public class OldCatalogsInfo
+    {
+        public string FolderPath { get; set; } = "";
+        public long TotalSize { get; set; }
+        public int FileCount { get; set; }
+        public DateTime OldestFileDate { get; set; }
+        public int AgeInDays { get; set; }
+        
+        public bool IsOlderThanOneMonth => AgeInDays >= 30;
+        
+        public string SizeFormatted
+        {
+            get
+            {
+                string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+                double len = TotalSize;
+                int order = 0;
+                while (len >= 1024 && order < sizes.Length - 1)
+                {
+                    order++;
+                    len /= 1024;
+                }
+                return $"{len:0.##} {sizes[order]}";
+            }
+        }
+        
+        public string AgeFormatted
+        {
+            get
+            {
+                if (AgeInDays < 7)
+                    return AgeInDays == 1 ? "1 dag" : $"{AgeInDays} dagen";
+                if (AgeInDays < 30)
+                {
+                    int weeks = AgeInDays / 7;
+                    return weeks == 1 ? "1 week" : $"{weeks} weken";
+                }
+                if (AgeInDays < 365)
+                {
+                    int months = AgeInDays / 30;
+                    return months == 1 ? "1 maand" : $"{months} maanden";
+                }
+                int years = AgeInDays / 365;
+                return years == 1 ? "1 jaar" : $"{years} jaar";
+            }
+        }
     }
 }
 

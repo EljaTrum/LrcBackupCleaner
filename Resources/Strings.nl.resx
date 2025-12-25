@@ -363,5 +363,41 @@ Klik 'Nee' om handmatig een map te selecteren.</value>
   <data name="OpenFolderTooltip" xml:space="preserve">
     <value>Klik om de map te openen in Verkenner</value>
   </data>
+
+  <!-- Old Lightroom Catalogs -->
+  <data name="OldCatalogsTitle" xml:space="preserve">
+    <value>Backup van oude Lightroom versie gevonden</value>
+  </data>
+  <data name="OldCatalogsInfo" xml:space="preserve">
+    <value>{0} bestanden gevonden ({1}) van een oudere Lightroom versie. Leeftijd: {2}. Na het updaten van Lightroom wordt aangeraden deze oude catalogi te verwijderen als alles goed werkt.</value>
+  </data>
+  <data name="DeleteOldCatalogs" xml:space="preserve">
+    <value>🗑️ Verwijderen</value>
+  </data>
+  <data name="DeleteOldCatalogsTitle" xml:space="preserve">
+    <value>Oude catalogi verwijderen</value>
+  </data>
+  <data name="DeleteOldCatalogsConfirm" xml:space="preserve">
+    <value>Weet je zeker dat je de "Old Lightroom Catalogs" map wilt verwijderen?
+
+Deze bevat {0} bestanden met een totale grootte van {1}.
+
+Deze actie kan niet ongedaan gemaakt worden!</value>
+  </data>
+  <data name="DeletingOldCatalogs" xml:space="preserve">
+    <value>Oude Lightroom catalogi verwijderen...</value>
+  </data>
+  <data name="OldCatalogsDeleted" xml:space="preserve">
+    <value>Oude Lightroom catalogi verwijderd. {0} schijfruimte vrijgemaakt.</value>
+  </data>
+  <data name="DeleteComplete" xml:space="preserve">
+    <value>Verwijderen voltooid</value>
+  </data>
+  <data name="DeleteOldCatalogsFailed" xml:space="preserve">
+    <value>Kon oude catalogi niet verwijderen: {0}</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Fout</value>
+  </data>
 </root>
 

@@ -23,6 +23,7 @@ namespace BackupCleaner
         private System.Windows.Threading.DispatcherTimer? _autoCleanupTimer;
         private bool _isScanning = false;
         private NotifyIcon? _notifyIcon;
+        private OldCatalogsInfo? _oldCatalogsInfo;
         
         private const string StartupRegistryKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
         private const string StartupValueName = "LightroomClassicBackupCleaner";
@@ -200,6 +201,119 @@ namespace BackupCleaner
             else
             {
                 txtCatalogInfo.Text = LocalizationService.GetString("NoCatalogSelected");
+            }
+        }
+
+        private async Task CheckForOldCatalogsAsync()
+        {
+            if (string.IsNullOrEmpty(_settings.BackupFolderPath))
+            {
+                oldCatalogsAlert.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            _oldCatalogsInfo = await Task.Run(() => 
+                LightroomDetectionService.FindOldLightroomCatalogs(_settings.BackupFolderPath!));
+
+            if (_oldCatalogsInfo != null && _oldCatalogsInfo.IsOlderThanOneMonth)
+            {
+                // Toon het alert blokje
+                UpdateOldCatalogsUI();
+                oldCatalogsAlert.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                oldCatalogsAlert.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void UpdateOldCatalogsUI()
+        {
+            if (_oldCatalogsInfo == null) return;
+
+            txtOldCatalogsTitle.Text = LocalizationService.GetString("OldCatalogsTitle");
+            
+            var infoText = LocalizationService.GetString("OldCatalogsInfo", 
+                _oldCatalogsInfo.FileCount, 
+                _oldCatalogsInfo.SizeFormatted,
+                _oldCatalogsInfo.AgeFormatted);
+            txtOldCatalogsInfo.Text = infoText;
+            
+            txtOldCatalogsPath.Text = $"📁 {_oldCatalogsInfo.FolderPath}";
+            
+            btnDeleteOldCatalogs.Content = LocalizationService.GetString("DeleteOldCatalogs");
+        }
+
+        private void OldCatalogsPath_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (_oldCatalogsInfo != null && Directory.Exists(_oldCatalogsInfo.FolderPath))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = _oldCatalogsInfo.FolderPath,
+                        UseShellExecute = true
+                    });
+                }
+                catch
+                {
+                    // Negeer fouten bij openen van map
+                }
+            }
+        }
+
+        private async void BtnDeleteOldCatalogs_Click(object sender, RoutedEventArgs e)
+        {
+            if (_oldCatalogsInfo == null || !Directory.Exists(_oldCatalogsInfo.FolderPath))
+                return;
+
+            var result = MessageBox.Show(
+                LocalizationService.GetString("DeleteOldCatalogsConfirm", 
+                    _oldCatalogsInfo.FileCount, 
+                    _oldCatalogsInfo.SizeFormatted),
+                LocalizationService.GetString("DeleteOldCatalogsTitle"),
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            try
+            {
+                btnDeleteOldCatalogs.IsEnabled = false;
+                txtStatus.Text = LocalizationService.GetString("DeletingOldCatalogs");
+
+                var folderPath = _oldCatalogsInfo.FolderPath;
+                var freedSpace = _oldCatalogsInfo.TotalSize;
+
+                await Task.Run(() =>
+                {
+                    // Verwijder alle bestanden en submappen
+                    Directory.Delete(folderPath, recursive: true);
+                });
+
+                MessageBox.Show(
+                    LocalizationService.GetString("OldCatalogsDeleted", FormatBytes(freedSpace)),
+                    LocalizationService.GetString("DeleteComplete"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                oldCatalogsAlert.Visibility = Visibility.Collapsed;
+                _oldCatalogsInfo = null;
+                txtStatus.Text = LocalizationService.GetString("Ready");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    LocalizationService.GetString("DeleteOldCatalogsFailed", ex.Message),
+                    LocalizationService.GetString("Error"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            finally
+            {
+                btnDeleteOldCatalogs.IsEnabled = true;
             }
         }
 
@@ -574,6 +688,9 @@ namespace BackupCleaner
 
                 UpdateStats();
                 txtStatus.Text = LocalizationService.GetString("ScanComplete", allBackups.Count);
+                
+                // Check ook voor oude Lightroom catalogi
+                await CheckForOldCatalogsAsync();
             }
             catch (Exception ex)
             {

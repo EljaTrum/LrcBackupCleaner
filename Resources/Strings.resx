@@ -363,5 +363,41 @@ Click 'No' to select a folder manually.</value>
   <data name="OpenFolderTooltip" xml:space="preserve">
     <value>Click to open folder in Explorer</value>
   </data>
+
+  <!-- Old Lightroom Catalogs -->
+  <data name="OldCatalogsTitle" xml:space="preserve">
+    <value>Old Lightroom version backup found</value>
+  </data>
+  <data name="OldCatalogsInfo" xml:space="preserve">
+    <value>Found {0} files ({1}) from an older Lightroom version. Age: {2}. After updating Lightroom, it is recommended to delete these old catalogs once everything works properly.</value>
+  </data>
+  <data name="DeleteOldCatalogs" xml:space="preserve">
+    <value>🗑️ Delete</value>
+  </data>
+  <data name="DeleteOldCatalogsTitle" xml:space="preserve">
+    <value>Delete old catalogs</value>
+  </data>
+  <data name="DeleteOldCatalogsConfirm" xml:space="preserve">
+    <value>Are you sure you want to delete the "Old Lightroom Catalogs" folder?
+
+This contains {0} files with a total size of {1}.
+
+This action cannot be undone!</value>
+  </data>
+  <data name="DeletingOldCatalogs" xml:space="preserve">
+    <value>Deleting old Lightroom catalogs...</value>
+  </data>
+  <data name="OldCatalogsDeleted" xml:space="preserve">
+    <value>Old Lightroom catalogs deleted. {0} disk space freed.</value>
+  </data>
+  <data name="DeleteComplete" xml:space="preserve">
+    <value>Delete complete</value>
+  </data>
+  <data name="DeleteOldCatalogsFailed" xml:space="preserve">
+    <value>Could not delete old catalogs: {0}</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
 </root>
 

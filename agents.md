@@ -79,6 +79,13 @@ De nieuwste X backups worden altijd bewaard, ongeacht leeftijd.
 - **Dagelijks**: Timer checkt elke minuut of het ingestelde tijdstip is bereikt. Windows Scheduled Task kan ook worden aangemaakt.
 - **Bij Windows start**: Via Registry (`HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run`) met `--auto-cleanup` argument. App start verborgen, voert cleanup uit, sluit af.
 
+### Old Lightroom Catalogs detectie
+Bij grote Lightroom versie updates maakt Adobe een "Old Lightroom Catalogs" map aan met een backup van de oude catalogus. De app:
+1. Zoekt automatisch naar deze map in de buurt van de backup locatie
+2. Als gevonden én ouder dan 1 maand, toont een waarschuwingsblokje
+3. Gebruiker kan de map met één klik verwijderen
+4. De map is klikbaar om in Verkenner te openen
+
 ### Startup Cleanup Flow
 1. App start met `--auto-cleanup` argument
 2. Window wordt verborgen (`Visibility.Hidden`, `ShowInTaskbar = false`)

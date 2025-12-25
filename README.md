@@ -14,6 +14,7 @@ Een Windows applicatie voor het automatisch beheren en opruimen van Adobe Lightr
 - **Minimale leeftijd** - Backups jonger dan X maanden worden nooit verwijderd
 - **Automatische opruiming** - Dagelijks op een instelbaar tijdstip
 - **Opruimen bij Windows start** - Automatisch opschonen bij opstarten PC
+- **Oude versie backup detectie** - Detecteert en verwijdert "Old Lightroom Catalogs" mappen
 - **System tray** - Draait op de achtergrond
 - **Meertalig** - Nederlands en Engels, met automatische taaldetectie
 - **Self-contained** - Geen .NET runtime installatie nodig
@@ -69,6 +70,14 @@ Klik op het backup pad bovenin om de map in Verkenner te openen.
 2. Schakel "Opruimen bij Windows start" in
 3. Bij elke Windows start worden oude backups automatisch verwijderd
 4. De app sluit daarna weer af (draait niet permanent)
+
+### Oude Lightroom versie backups
+Wanneer Lightroom Classic een grote versie-update krijgt, maakt Adobe automatisch een backup van je oude catalogus in een map genaamd "Old Lightroom Catalogs". De app detecteert deze map automatisch en:
+- Toont een waarschuwing als de map ouder is dan 1 maand
+- Laat je de map met één klik verwijderen
+- De maplocatie is klikbaar om te openen in Verkenner
+
+Dit helpt je om na een succesvolle update de oude catalogusbestanden op te ruimen.
 
 ## 🎨 Screenshot
 

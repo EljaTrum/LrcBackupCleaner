@@ -56,6 +56,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -243,8 +244,81 @@
             </Grid>
         </Border>
 
+        <!-- Old Lightroom Catalogs Alert -->
+        <Border x:Name="oldCatalogsAlert" 
+                Grid.Row="2" 
+                Style="{StaticResource CardStyle}" 
+                Margin="0,0,0,16"
+                Background="#2D1F00"
+                BorderBrush="{StaticResource WarningBrush}"
+                BorderThickness="1"
+                Visibility="Collapsed">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Warning Icon -->
+                <Border Grid.Column="0" 
+                        Width="40" Height="40" 
+                        CornerRadius="8" 
+                        Background="{StaticResource WarningBrush}"
+                        Margin="0,0,16,0"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="⚠️" 
+                               FontSize="20"
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Center"/>
+                </Border>
+                
+                <!-- Info Text -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock x:Name="txtOldCatalogsTitle"
+                               Text="Oude Lightroom versie backup gevonden" 
+                               FontSize="14" 
+                               FontWeight="SemiBold" 
+                               Foreground="{StaticResource WarningBrush}"/>
+                    <TextBlock x:Name="txtOldCatalogsInfo"
+                               Text="" 
+                               FontSize="12" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               TextWrapping="Wrap"
+                               Margin="0,4,0,0"/>
+                    <TextBlock x:Name="txtOldCatalogsPath"
+                               Text="" 
+                               FontSize="11" 
+                               Foreground="{StaticResource AccentBrush}"
+                               Cursor="Hand"
+                               TextDecorations="Underline"
+                               MouseLeftButtonDown="OldCatalogsPath_Click"
+                               Margin="0,4,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+                
+                <!-- Delete Button -->
+                <Button x:Name="btnDeleteOldCatalogs"
+                        Grid.Column="2"
+                        Content="🗑️ Verwijderen"
+                        Click="BtnDeleteOldCatalogs_Click"
+                        Style="{StaticResource AccentButtonStyle}"
+                        Padding="16,10"
+                        VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
         <!-- Backup List -->
-        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,16">
+        <Border Grid.Row="3" Style="{StaticResource CardStyle}" Margin="0,0,0,16">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -395,7 +469,7 @@
         </Border>
 
         <!-- Status Bar -->
-        <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="16,12">
+        <Border Grid.Row="4" Style="{StaticResource CardStyle}" Padding="16,12">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
