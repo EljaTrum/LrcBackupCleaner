@@ -21,7 +21,8 @@ Een Windows applicatie voor het automatisch beheren en opruimen van Adobe Lightr
 ## 🚀 Installatie
 
 ### Voorgecompileerde versie
-Download `LightroomBackupCleaner.exe` uit de Releases en plaats deze waar je wilt. De applicatie is self-contained en heeft geen extra installatie nodig.
+Download `LightroomBackupCleaner.zip` via onderstaande link, pak de .exe uit en plaats deze waar je wilt. De applicatie is self-contained en heeft geen extra installatie nodig.
+Link: https://photofactsacademy.s3.eu-west-1.amazonaws.com/LightroomBackupCleaner.zip
 
 ### Bouwen vanuit broncode
 ```bash
