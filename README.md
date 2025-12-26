@@ -28,7 +28,7 @@ Link: https://photofactsacademy.s3.eu-west-1.amazonaws.com/LightroomBackupCleane
 ### Bouwen vanuit broncode
 ```bash
 git clone https://github.com/EljaTrum/LrcBackupCleaner.git
-cd LightroomBackupCleaner
+cd LrcBackupCleaner
 dotnet publish -c Release -o publish
 ```
 
