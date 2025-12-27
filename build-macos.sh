@@ -16,7 +16,19 @@ APP_NAME="LightroomBackupCleaner"
 BUNDLE_NAME="${APP_NAME}.app"
 VERSION="0.2.0"
 ARCH="${1:-osx-arm64}"
-SIGNING_IDENTITY="${2:-}"
+
+# Load local configuration if it exists (not in git)
+if [[ -f "build-macos.config.sh" ]]; then
+    source "build-macos.config.sh"
+fi
+
+# Signing identity: command line arg > environment variable > config file > empty
+SIGNING_IDENTITY="${2:-${MACOS_SIGNING_IDENTITY:-}}"
+
+# Notarization credentials: environment variables > config file
+APPLE_ID="${MACOS_APPLE_ID:-}"
+TEAM_ID="${MACOS_TEAM_ID:-}"
+APP_SPECIFIC_PASSWORD="${MACOS_APP_SPECIFIC_PASSWORD:-}"
 
 # Validate architecture
 if [[ "$ARCH" != "osx-x64" && "$ARCH" != "osx-arm64" ]]; then
