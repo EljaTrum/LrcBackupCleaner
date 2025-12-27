@@ -1,31 +1,59 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- Exclude WPF backup folder from compilation -->
+  <ItemGroup>
+    <Compile Remove="wpf-backup\**" />
+    <Content Remove="wpf-backup\**" />
+    <EmbeddedResource Remove="wpf-backup\**" />
+    <None Remove="wpf-backup\**" />
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
-    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
     <AssemblyName>LightroomBackupCleaner</AssemblyName>
     <RootNamespace>BackupCleaner</RootNamespace>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Photofacts Academy</Authors>
     <Company>Photofacts Academy</Company>
-    <Description>Adobe Lightroom Classic Backup Cleanup Tool - Beheer en ruim oude catalogus backups automatisch op</Description>
-    <ApplicationIcon>app.ico</ApplicationIcon>
+    <Description>Adobe Lightroom Classic Backup Cleanup Tool - Cross-platform (Windows/macOS)</Description>
+    <ApplicationIcon>Assets/app.ico</ApplicationIcon>
     
-    <!-- Single-file publishing opties -->
+    <!-- Cross-platform publishing -->
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+    <AvaloniaResource Include="Assets\**"/>
+    <AvaloniaResource Include="Styles\**"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Strings.nl.resx">
+      <DependentUpon>Strings.resx</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.0" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.0" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.0" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from publish in Release configuration.-->
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="SkiaSharp" Version="2.88.9" />
+  </ItemGroup>
 
 </Project>

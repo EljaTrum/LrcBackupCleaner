@@ -1,0 +1,385 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="700"
+        x:Class="BackupCleaner.MainWindow"
+        Title="Lightroom Classic Backup Cleaner"
+        Width="900" Height="700"
+        MinWidth="700" MinHeight="500"
+        Background="{StaticResource BackgroundBrush}"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,*,Auto">
+
+        <!-- Header -->
+        <Border Grid.Row="0" Classes="card" Margin="0,0,0,16">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                
+                <!-- Logo/Icon -->
+                <Border Grid.Column="0" 
+                        Width="48" Height="48" 
+                        CornerRadius="8" 
+                        Background="{StaticResource AccentBrush}"
+                        Margin="0,0,16,0">
+                    <Image x:Name="appLogo"
+                           Width="48" 
+                           Height="48"
+                           Stretch="Uniform"
+                           HorizontalAlignment="Center" 
+                           VerticalAlignment="Center"/>
+                </Border>
+                
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="Lightroom Classic Backup Cleaner" 
+                               FontSize="22" 
+                               FontWeight="Bold" 
+                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                        <TextBlock x:Name="txtCatalogIcon"
+                                   Text="📍 " 
+                                   FontSize="13" 
+                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <TextBlock x:Name="txtCatalogInfo" 
+                                   Text="Geen catalogus geselecteerd" 
+                                   FontSize="13" 
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Classes="clickable"
+                                   PointerPressed="CatalogInfo_Click"/>
+                    </StackPanel>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
+                    <Button x:Name="btnSettings"
+                            Content="⚙️ Instellingen" 
+                            Click="BtnSettings_Click"
+                            Classes="secondary small"/>
+                    <Button x:Name="btnChangeFolder"
+                            Content="📁 Map Wijzigen" 
+                            Click="BtnSelectFolder_Click"
+                            Classes="secondary small"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Toolbar / Stats -->
+        <Border Grid.Row="1" Classes="card" Margin="0,0,0,16">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+                
+                <Button x:Name="btnScan" 
+                        Grid.Column="0" 
+                        Content="🔄 Vernieuwen" 
+                        Click="BtnScan_Click"
+                        Classes="primary"
+                        Padding="16,10"
+                        Margin="0,0,8,0"/>
+                
+                <Button x:Name="btnCleanup" 
+                        Grid.Column="1" 
+                        Content="🗑️ Opruimen" 
+                        Click="BtnCleanup_Click"
+                        Classes="danger"
+                        Padding="16,10"
+                        Margin="0,0,16,0"/>
+                
+                <!-- Spacer -->
+                <Panel Grid.Column="2"/>
+                
+                <!-- Min Leeftijd -->
+                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+                    <TextBlock x:Name="txtMinAgeLabel"
+                               Text="Min. leeftijd:" 
+                               VerticalAlignment="Center" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,8,0"/>
+                    <Border Background="{StaticResource SecondaryBrush}" 
+                            CornerRadius="4" 
+                            BorderBrush="{StaticResource BorderBrush}" 
+                            BorderThickness="1"
+                            Padding="6,4"
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="−" 
+                                    Click="BtnDecreaseMinAge_Click" 
+                                    Width="24" Height="24"
+                                    VerticalAlignment="Center"
+                                    Classes="icon"/>
+                            <TextBlock x:Name="txtMinAge" 
+                                       Text="1" 
+                                       Width="24" 
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontWeight="SemiBold"/>
+                            <Button Content="+" 
+                                    Click="BtnIncreaseMinAge_Click" 
+                                    Width="24" Height="24"
+                                    VerticalAlignment="Center"
+                                    Classes="icon"/>
+                        </StackPanel>
+                    </Border>
+                    <TextBlock x:Name="txtMonthsLabel"
+                               Text="mnd" 
+                               VerticalAlignment="Center" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="4,0,0,0"/>
+                </StackPanel>
+                
+                <!-- Bewaren -->
+                <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock x:Name="txtKeepLabel"
+                               Text="Bewaren:" 
+                               VerticalAlignment="Center" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,8,0"/>
+                    <Border Background="{StaticResource SecondaryBrush}" 
+                            CornerRadius="4" 
+                            BorderBrush="{StaticResource BorderBrush}" 
+                            BorderThickness="1"
+                            Padding="6,4"
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="−" 
+                                    Click="BtnDecreaseKeep_Click" 
+                                    Width="24" Height="24"
+                                    VerticalAlignment="Center"
+                                    Classes="icon"/>
+                            <TextBlock x:Name="txtBackupsToKeep" 
+                                       Text="5" 
+                                       Width="24" 
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontWeight="SemiBold"/>
+                            <Button Content="+" 
+                                    Click="BtnIncreaseKeep_Click" 
+                                    Width="24" Height="24"
+                                    VerticalAlignment="Center"
+                                    Classes="icon"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Old Lightroom Catalogs Alert -->
+        <Border x:Name="oldCatalogsAlert" 
+                Grid.Row="2" 
+                Classes="card"
+                Margin="0,0,0,16"
+                Background="#2D1F00"
+                BorderBrush="{StaticResource WarningBrush}"
+                BorderThickness="1"
+                IsVisible="False">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                
+                <!-- Warning Icon -->
+                <Border Grid.Column="0" 
+                        Width="40" Height="40" 
+                        CornerRadius="8" 
+                        Background="{StaticResource WarningBrush}"
+                        Margin="0,0,16,0"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="⚠️" 
+                               FontSize="20"
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Center"/>
+                </Border>
+                
+                <!-- Info Text -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,16,0">
+                    <TextBlock x:Name="txtOldCatalogsTitle"
+                               Text="Oude Lightroom versie backup gevonden" 
+                               FontSize="14" 
+                               FontWeight="SemiBold" 
+                               Foreground="{StaticResource WarningBrush}"/>
+                    <TextBlock x:Name="txtOldCatalogsInfo"
+                               Text="" 
+                               FontSize="12" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               TextWrapping="Wrap"
+                               Margin="0,4,0,0"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                        <TextBlock Text="📁 " 
+                                   FontSize="11" 
+                                   Foreground="{StaticResource AccentBrush}"/>
+                        <TextBlock x:Name="txtOldCatalogsPath"
+                                   Text="" 
+                                   FontSize="11" 
+                                   Classes="link"
+                                   PointerPressed="OldCatalogsPath_Click"/>
+                    </StackPanel>
+                </StackPanel>
+                
+                <!-- Delete Button -->
+                <Button x:Name="btnDeleteOldCatalogs"
+                        Grid.Column="2"
+                        Content="🗑️ Verwijderen"
+                        Click="BtnDeleteOldCatalogs_Click"
+                        Classes="danger"
+                        Padding="16,10"
+                        VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Backup List -->
+        <Border Grid.Row="3" Classes="card" Margin="0,0,0,16">
+            <Grid RowDefinitions="Auto,*">
+                
+                <!-- List Header -->
+                <Grid Grid.Row="0" Margin="0,0,20,12" ColumnDefinitions="44,*,120,100">
+                    <TextBlock Grid.Column="0" Text="" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBlock Grid.Column="1" x:Name="txtHeaderBackupDate" Text="Backup Datum" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBlock Grid.Column="2" x:Name="txtHeaderAge" Text="Leeftijd" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBlock Grid.Column="3" x:Name="txtHeaderSize" Text="Grootte" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Right"/>
+                </Grid>
+                
+                <!-- List Content -->
+                <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="lstBackups" Margin="0,0,20,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="{StaticResource BorderBrush}" 
+                                        BorderThickness="0,0,0,1" 
+                                        Padding="0,8"
+                                        Margin="0,0,0,2"
+                                        Background="{Binding RowBackground}">
+                                    <Grid ColumnDefinitions="44,*,120,100">
+                                        
+                                        <!-- Status icon -->
+                                        <Border Grid.Column="0"
+                                                Width="32" Height="32"
+                                                CornerRadius="6"
+                                                Background="{Binding StatusBackground}"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                ToolTip.Tip="{Binding StatusTooltip}">
+                                            <TextBlock Text="{Binding StatusIcon}"
+                                                       FontSize="14"
+                                                       FontWeight="Bold"
+                                                       Foreground="White"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+                                        </Border>
+                                        
+                                        <!-- Backup datum en catalogus naam -->
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding BackupDateFormatted}" 
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                                            <TextBlock Text="{Binding CatalogFileName}" 
+                                                       FontSize="11"
+                                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                        
+                                        <!-- Leeftijd -->
+                                        <TextBlock Grid.Column="2" 
+                                                   Text="{Binding AgeFormatted}" 
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        
+                                        <!-- Grootte -->
+                                        <TextBlock Grid.Column="3" 
+                                                   Text="{Binding SizeFormatted}" 
+                                                   TextAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                                   FontWeight="SemiBold"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+                
+                <!-- Empty State -->
+                <StackPanel x:Name="emptyState" 
+                            Grid.Row="1" 
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"
+                            IsVisible="False">
+                    <TextBlock Text="📂" FontSize="48" HorizontalAlignment="Center" Opacity="0.5"/>
+                    <TextBlock x:Name="txtEmptyTitle"
+                               Text="Geen backups gevonden" 
+                               FontSize="18" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,12,0,0"/>
+                    <TextBlock x:Name="txtEmptySubtitle"
+                               Text="Selecteer een Lightroom backup map om te beginnen" 
+                               FontSize="14" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,4,0,12"/>
+                    <Button x:Name="btnEmptySelectFolder"
+                            Content="📁 Backup Map Selecteren" 
+                            Click="BtnSelectFolder_Click"
+                            Classes="primary"
+                            HorizontalAlignment="Center"/>
+                </StackPanel>
+                
+                <!-- Searching State -->
+                <StackPanel x:Name="searchingState" 
+                            Grid.Row="1" 
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"
+                            IsVisible="False">
+                    <TextBlock Text="🔍" FontSize="48" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="txtSearchingMessage"
+                               Text="Zoeken naar Lightroom backups..." 
+                               FontSize="16" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,12,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="4" Classes="card" Padding="16,12">
+            <StackPanel>
+                <!-- Stats row -->
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+                    
+                    <TextBlock x:Name="txtStatus" 
+                               Grid.Column="0"
+                               Text="Gereed" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"/>
+                    
+                    <!-- Spacer -->
+                    <Panel Grid.Column="1"/>
+                    
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="0,0,24,0">
+                        <TextBlock x:Name="txtTotalLabel" Text="Totaal: " Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <TextBlock x:Name="txtTotalBackups" Text="0 backups" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="0,0,24,0">
+                        <TextBlock x:Name="txtToDeleteLabel" Text="Te verwijderen: " Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <TextBlock x:Name="txtToDelete" Text="0" FontWeight="SemiBold" Foreground="{StaticResource WarningBrush}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="4" Orientation="Horizontal">
+                        <TextBlock x:Name="txtSpaceLabel" Text="Vrij te maken: " Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <TextBlock x:Name="txtSpaceToFree" Text="0 B" FontWeight="SemiBold" Foreground="{StaticResource SuccessBrush}"/>
+                    </StackPanel>
+                </Grid>
+                
+                <!-- Made by row - links -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0">
+                    <TextBlock x:Name="txtMadeByLabel"
+                               Text="Gemaakt door " 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="12"/>
+                    <TextBlock Text="Photofacts Academy" 
+                               Classes="link"
+                               FontSize="12"
+                               PointerPressed="PhotofactsLink_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
+

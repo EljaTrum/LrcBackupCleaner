@@ -1,165 +1,247 @@
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Text;
 using System.IO;
+using SkiaSharp;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Platform;
+using Avalonia.Media.Imaging;
 
-namespace BackupCleaner
+namespace BackupCleaner;
+
+/// <summary>
+/// Cross-platform icon loader using SkiaSharp
+/// </summary>
+public static class IconGenerator
 {
-    public static class IconGenerator
+    private static SKBitmap? _sourceBitmap;
+    
+    /// <summary>
+    /// Loads the source PNG icon from assets
+    /// </summary>
+    private static SKBitmap LoadSourceIcon()
     {
-        public static Icon CreateAppIcon()
-        {
-            return CreateAppIconAtSize(256);
-        }
+        if (_sourceBitmap != null)
+            return _sourceBitmap;
         
-        private static Icon CreateAppIconAtSize(int size)
+        try
         {
-            using var bitmap = CreateAppBitmap(size);
-            return Icon.FromHandle(bitmap.GetHicon());
-        }
-        
-        private static Bitmap CreateAppBitmap(int size)
-        {
-            var bitmap = new Bitmap(size, size);
-            using var g = Graphics.FromImage(bitmap);
-            
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-            g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            
-            // Schaal factor
-            float scale = size / 256f;
-            
-            // Achtergrond - Lightroom-stijl donker met accent kleur
-            using var bgBrush = new SolidBrush(Color.FromArgb(26, 26, 26)); // #1A1A1A
-            var bgRect = new Rectangle(
-                (int)(16 * scale), 
-                (int)(16 * scale), 
-                (int)(224 * scale), 
-                (int)(224 * scale)
-            );
-            int radius = (int)(40 * scale);
-            FillRoundedRectangle(g, bgBrush, bgRect, radius);
-            
-            // Accent rand
-            using var accentPen = new Pen(Color.FromArgb(14, 165, 233), Math.Max(1, (int)(4 * scale))); // #0EA5E9
-            DrawRoundedRectangle(g, accentPen, bgRect, radius);
-            
-            // "Lrc" tekst in Lightroom Classic stijl
-            using var textBrush = new SolidBrush(Color.FromArgb(14, 165, 233)); // #0EA5E9
-            using var font = new Font("Segoe UI", Math.Max(8, 56 * scale), FontStyle.Bold);
-            
-            var textRect = new RectangleF(20 * scale, 55 * scale, 216 * scale, 120 * scale);
-            var sf = new StringFormat
-            {
-                Alignment = StringAlignment.Center,
-                LineAlignment = StringAlignment.Center
-            };
-            
-            g.DrawString("Lrc", font, textBrush, textRect, sf);
-            
-            // Vinkje symbool rechtsonder
-            using var checkPen = new Pen(Color.FromArgb(34, 197, 94), Math.Max(1, (int)(8 * scale))) 
-            { 
-                StartCap = LineCap.Round, 
-                EndCap = LineCap.Round 
-            };
-            g.DrawLine(checkPen, 150 * scale, 185 * scale, 175 * scale, 210 * scale);
-            g.DrawLine(checkPen, 175 * scale, 210 * scale, 215 * scale, 165 * scale);
-            
-            return bitmap;
-        }
-
-        /// <summary>
-        /// Maakt een correct ICO bestand met meerdere resoluties voor Windows Verkenner
-        /// </summary>
-        public static void SaveIconToFile(string path)
-        {
-            var sizes = new[] { 16, 24, 32, 48, 64, 128, 256 };
-            var images = new List<Bitmap>();
-            
-            foreach (var size in sizes)
-            {
-                images.Add(CreateAppBitmap(size));
-            }
-            
+            // Try to load from Avalonia resources (at runtime)
             try
             {
-                using var fs = new FileStream(path, FileMode.Create);
-                WriteIcoFile(fs, images);
-            }
-            finally
-            {
-                foreach (var img in images)
+                var uri = new Uri("avares://LightroomBackupCleaner/Assets/lrcbackupcleaner.png");
+                using var stream = AssetLoader.Open(uri);
+                if (stream != null)
                 {
-                    img.Dispose();
+                    _sourceBitmap = SKBitmap.Decode(stream);
+                    return _sourceBitmap;
                 }
             }
+            catch
+            {
+                // Continue to file system fallback
+            }
+            
+            // Fallback: try to load from file system (for development/build time)
+            var pngPath = Path.Combine(AppContext.BaseDirectory, "Assets", "lrcbackupcleaner.png");
+            if (File.Exists(pngPath))
+            {
+                using var stream = File.OpenRead(pngPath);
+                _sourceBitmap = SKBitmap.Decode(stream);
+                return _sourceBitmap;
+            }
+            
+            // Fallback: try relative path
+            pngPath = Path.Combine("Assets", "lrcbackupcleaner.png");
+            if (File.Exists(pngPath))
+            {
+                using var stream = File.OpenRead(pngPath);
+                _sourceBitmap = SKBitmap.Decode(stream);
+                return _sourceBitmap;
+            }
+        }
+        catch
+        {
+            // If loading fails, fall back to generated icon
         }
         
-        private static void WriteIcoFile(Stream stream, List<Bitmap> images)
+        // Fallback: generate icon programmatically if PNG not found
+        return CreateGeneratedIcon(256);
+    }
+    
+    /// <summary>
+    /// Creates the app icon as a bitmap from the loaded PNG, resized to the requested size
+    /// </summary>
+    public static SKBitmap CreateAppBitmap(int size = 256)
+    {
+        var source = LoadSourceIcon();
+        
+        // If source is already the right size, return it
+        if (source.Width == size && source.Height == size)
+            return source.Copy();
+        
+        // Resize the source bitmap to the requested size
+        var resized = source.Resize(new SKImageInfo(size, size), SKFilterQuality.High);
+        return resized;
+    }
+    
+    /// <summary>
+    /// Creates a programmatically generated icon (fallback)
+    /// </summary>
+    private static SKBitmap CreateGeneratedIcon(int size = 256)
+    {
+        var bitmap = new SKBitmap(size, size);
+        using var canvas = new SKCanvas(bitmap);
+        
+        canvas.Clear(SKColors.Transparent);
+        
+        float scale = size / 256f;
+        
+        // Achtergrond - Lightroom-stijl donker met accent kleur
+        using var bgPaint = new SKPaint
         {
-            using var writer = new BinaryWriter(stream);
-            
-            // ICO Header
-            writer.Write((short)0);              // Reserved
-            writer.Write((short)1);              // Type: 1 = ICO
-            writer.Write((short)images.Count);   // Number of images
-            
-            // Bereken offset voor image data
-            int offset = 6 + (images.Count * 16); // Header + directory entries
-            var imageDataList = new List<byte[]>();
-            
-            // Schrijf directory entries
-            foreach (var bitmap in images)
-            {
-                using var ms = new MemoryStream();
-                bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                var imageData = ms.ToArray();
-                imageDataList.Add(imageData);
-                
-                writer.Write((byte)(bitmap.Width >= 256 ? 0 : bitmap.Width));   // Width
-                writer.Write((byte)(bitmap.Height >= 256 ? 0 : bitmap.Height)); // Height
-                writer.Write((byte)0);          // Color palette
-                writer.Write((byte)0);          // Reserved
-                writer.Write((short)1);         // Color planes
-                writer.Write((short)32);        // Bits per pixel
-                writer.Write(imageData.Length); // Image size
-                writer.Write(offset);           // Offset
-                
-                offset += imageData.Length;
-            }
-            
-            // Schrijf image data
-            foreach (var imageData in imageDataList)
-            {
-                writer.Write(imageData);
-            }
-        }
+            Color = new SKColor(26, 26, 26), // #1A1A1A
+            IsAntialias = true,
+            Style = SKPaintStyle.Fill
+        };
+        
+        var bgRect = new SKRect(16 * scale, 16 * scale, 240 * scale, 240 * scale);
+        canvas.DrawRoundRect(bgRect, 40 * scale, 40 * scale, bgPaint);
+        
+        // Accent rand
+        using var accentPaint = new SKPaint
+        {
+            Color = new SKColor(14, 165, 233), // #0EA5E9
+            IsAntialias = true,
+            Style = SKPaintStyle.Stroke,
+            StrokeWidth = 4 * scale
+        };
+        canvas.DrawRoundRect(bgRect, 40 * scale, 40 * scale, accentPaint);
+        
+        // "Lrc" tekst
+        using var textPaint = new SKPaint
+        {
+            Color = new SKColor(14, 165, 233), // #0EA5E9
+            IsAntialias = true,
+            TextSize = 56 * scale,
+            Typeface = SKTypeface.FromFamilyName("Segoe UI", SKFontStyle.Bold),
+            TextAlign = SKTextAlign.Center
+        };
+        
+        canvas.DrawText("Lrc", 128 * scale, 145 * scale, textPaint);
+        
+        // Vinkje symbool rechtsonder
+        using var checkPaint = new SKPaint
+        {
+            Color = new SKColor(34, 197, 94), // #22C55E
+            IsAntialias = true,
+            Style = SKPaintStyle.Stroke,
+            StrokeWidth = 8 * scale,
+            StrokeCap = SKStrokeCap.Round
+        };
+        
+        using var path = new SKPath();
+        path.MoveTo(150 * scale, 185 * scale);
+        path.LineTo(175 * scale, 210 * scale);
+        path.LineTo(215 * scale, 165 * scale);
+        canvas.DrawPath(path, checkPaint);
+        
+        return bitmap;
+    }
 
-        private static void FillRoundedRectangle(Graphics g, Brush brush, Rectangle rect, int radius)
+    /// <summary>
+    /// Creates an Avalonia WindowIcon from the loaded PNG
+    /// </summary>
+    public static WindowIcon? CreateWindowIcon()
+    {
+        try
         {
-            using var path = CreateRoundedRectanglePath(rect, radius);
-            g.FillPath(brush, path);
+            using var bitmap = CreateAppBitmap(256);
+            using var image = SKImage.FromBitmap(bitmap);
+            using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+            using var stream = new MemoryStream(data.ToArray());
+            return new WindowIcon(stream);
         }
-
-        private static void DrawRoundedRectangle(Graphics g, Pen pen, Rectangle rect, int radius)
+        catch
         {
-            using var path = CreateRoundedRectanglePath(rect, radius);
-            g.DrawPath(pen, path);
+            return null;
         }
+    }
 
-        private static GraphicsPath CreateRoundedRectanglePath(Rectangle rect, int radius)
+    /// <summary>
+    /// Creates an Avalonia Bitmap from the loaded PNG for use in Image controls
+    /// </summary>
+    public static Bitmap? CreateBitmap(int size = 256)
+    {
+        try
         {
-            var path = new GraphicsPath();
-            path.AddArc(rect.X, rect.Y, radius, radius, 180, 90);
-            path.AddArc(rect.Right - radius, rect.Y, radius, radius, 270, 90);
-            path.AddArc(rect.Right - radius, rect.Bottom - radius, radius, radius, 0, 90);
-            path.AddArc(rect.X, rect.Bottom - radius, radius, radius, 90, 90);
-            path.CloseFigure();
-            return path;
+            using var skBitmap = CreateAppBitmap(size);
+            using var skImage = SKImage.FromBitmap(skBitmap);
+            using var data = skImage.Encode(SKEncodedImageFormat.Png, 100);
+            using var stream = new MemoryStream(data.ToArray());
+            return new Bitmap(stream);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Saves the icon as a PNG file
+    /// </summary>
+    public static void SaveIconAsPng(string path, int size = 256)
+    {
+        using var bitmap = CreateAppBitmap(size);
+        using var image = SKImage.FromBitmap(bitmap);
+        using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+        using var stream = File.OpenWrite(path);
+        data.SaveTo(stream);
+    }
+
+    /// <summary>
+    /// Saves the icon as a multi-resolution ICO file (Windows only)
+    /// </summary>
+    public static void SaveIconToFile(string path)
+    {
+        var sizes = new[] { 16, 24, 32, 48, 64, 128, 256 };
+        
+        using var fs = new FileStream(path, FileMode.Create);
+        using var writer = new BinaryWriter(fs);
+        
+        // ICO Header
+        writer.Write((short)0);              // Reserved
+        writer.Write((short)1);              // Type: 1 = ICO
+        writer.Write((short)sizes.Length);   // Number of images
+        
+        // Calculate offset for image data
+        int offset = 6 + (sizes.Length * 16); // Header + directory entries
+        var imageDataList = new System.Collections.Generic.List<byte[]>();
+        
+        // Create images and write directory entries
+        foreach (var size in sizes)
+        {
+            using var bitmap = CreateAppBitmap(size);
+            using var image = SKImage.FromBitmap(bitmap);
+            using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+            var imageData = data.ToArray();
+            imageDataList.Add(imageData);
+            
+            writer.Write((byte)(size >= 256 ? 0 : size));   // Width
+            writer.Write((byte)(size >= 256 ? 0 : size));   // Height
+            writer.Write((byte)0);          // Color palette
+            writer.Write((byte)0);          // Reserved
+            writer.Write((short)1);         // Color planes
+            writer.Write((short)32);        // Bits per pixel
+            writer.Write(imageData.Length); // Image size
+            writer.Write(offset);           // Offset
+            
+            offset += imageData.Length;
+        }
+        
+        // Write image data
+        foreach (var imageData in imageDataList)
+        {
+            writer.Write(imageData);
         }
     }
 }

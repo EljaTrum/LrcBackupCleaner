@@ -4,13 +4,14 @@ Dit bestand bevat context en instructies voor AI assistenten die werken aan dit 
 
 ## Project Overzicht
 
-**Lightroom Classic Backup Cleaner** is een Windows WPF applicatie (.NET 8) voor het automatisch opruimen van oude Adobe Lightroom Classic catalogus backups.
+**Lightroom Classic Backup Cleaner** is een cross-platform Avalonia UI applicatie (.NET 8) voor het automatisch opruimen van oude Adobe Lightroom Classic catalogus backups.
 
 ### Belangrijke kenmerken
-- WPF met donker Lightroom-geïnspireerd thema
+- Avalonia UI met donker Lightroom-geïnspireerd thema
+- Cross-platform: Windows en macOS (Intel + Apple Silicon)
 - Automatische detectie van Lightroom backup locaties
 - Async/await voor UI responsiviteit tijdens scans
-- System tray integratie voor achtergrond draaien
+- System tray integratie voor achtergrond draaien (Windows)
 - Windows Startup integratie (via Registry) voor automatische opruiming bij PC start
 - Windows Task Scheduler integratie voor dagelijkse automatische opruiming
 - JSON-based settings opslag
@@ -19,32 +20,39 @@ Dit bestand bevat context en instructies voor AI assistenten die werken aan dit 
 
 ## Architectuur
 
-### UI Layer
-- `MainWindow.xaml/.cs` - Hoofdvenster met backup lijst, instellingen, statusbalk
-- `CleanupPreviewWindow.xaml/.cs` - Preview van te verwijderen backups
-- `SettingsWindow.xaml/.cs` - Instellingen voor automatisch opruimen, taal, Windows startup
-- `App.xaml` - Globale resources, donker thema, button/checkbox/scrollbar styles
+### UI Layer (Avalonia)
+- `Views/MainWindow.axaml/.cs` - Hoofdvenster met backup lijst, instellingen, statusbalk
+- `Views/CleanupPreviewWindow.axaml/.cs` - Preview van te verwijderen backups
+- `Views/SettingsWindow.axaml/.cs` - Instellingen voor automatisch opruimen, taal, Windows startup
+- `App.axaml/.cs` - Applicatie entry point, globale resources
+- `Styles/AppStyles.axaml` - Donker thema, button/checkbox styles, kleuren
+
+### ViewModels
+- `LightroomBackupViewModel` - ViewModel voor backup items met status, kleuren, tooltips
 
 ### Models
 - `LightroomBackup` - Representeert een Lightroom backup map (INotifyPropertyChanged)
 - `FileToDelete` - Informatie over te verwijderen backup voor preview
-- `BackupSet` - (Legacy) Groep bestanden met dezelfde datum
-- `CustomerFolder` - (Legacy) Niet gebruikt
+- `AppSettings` - Applicatie instellingen model
 
 ### Services
 - `BackupService` - Core logica: scannen Lightroom backups, bepalen wat te verwijderen
-- `LightroomDetectionService` - Auto-detectie van Lightroom backup locaties
-- `SettingsService` - JSON opslag in %APPDATA%/LightroomBackupCleaner
+- `LightroomDetectionService` - Auto-detectie van Lightroom backup locaties (Windows + macOS paden)
+- `SettingsService` - JSON opslag in platform-specifieke locatie
 - `LocalizationService` - Meertaligheid met resource files
-- `IgnoreService` - (Legacy) Voor negeerlijst, niet actief gebruikt
+
+### Platform Services
+- `Services/Platform/IPlatformServices.cs` - Interface voor platform-specifieke functionaliteit
+- `Services/Platform/WindowsServices.cs` - Windows implementatie (Registry, Task Scheduler, NotifyIcon)
+- `Services/Platform/MacOSServices.cs` - macOS implementatie (launchd, preferences)
 
 ### Hulpklassen
-- `IconGenerator` - Genereert programmatisch het app icoon ("Lrc" stijl met vinkje)
+- `IconGenerator` - Genereert programmatisch het app icoon ("Lrc" stijl) met SkiaSharp
 
 ### Resources
 - `Resources/Strings.resx` - Engelse UI teksten
 - `Resources/Strings.nl.resx` - Nederlandse UI teksten
-- `app.ico` - Ingebakken applicatie icoon
+- `Assets/app.ico` - Ingebakken applicatie icoon
 
 ## Lightroom Backup Structuur
 
@@ -54,10 +62,15 @@ Adobe Lightroom Classic maakt backups als volgt:
 - Backups worden typisch opgeslagen in een "Backups" submap naast de catalogus
 
 ### Auto-detectie locaties
-De app zoekt automatisch in:
+
+**Windows:**
 - Afbeeldingen/Lightroom
 - Documenten/Lightroom
 - Alle vaste schijven: /Lightroom, /Lightroom Catalog, /Adobe/Lightroom
+
+**macOS:**
+- ~/Library/Application Support/Adobe/Lightroom
+- ~/Pictures/Lightroom
 - Mappen die een `Backups` submap bevatten met datum-format submappen
 
 ## Belangrijke logica
@@ -76,23 +89,27 @@ Een backup mag verwijderd worden als:
 De nieuwste X backups worden altijd bewaard, ongeacht leeftijd.
 
 ### Automatische opruiming
-- **Dagelijks**: Timer checkt elke minuut of het ingestelde tijdstip is bereikt. Windows Scheduled Task kan ook worden aangemaakt.
-- **Bij Windows start**: Via Registry (`HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run`) met `--auto-cleanup` argument. App start verborgen, voert cleanup uit, sluit af.
+**Windows:**
+- **Dagelijks**: Windows Scheduled Task op ingesteld tijdstip
+- **Bij Windows start**: Via Registry (`HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run`) met `--auto-cleanup` argument
+
+**macOS:**
+- **Dagelijks**: launchd met `StartCalendarInterval` in `~/Library/LaunchAgents/`
+- **Bij login**: launchd met `RunAtLoad` in `~/Library/LaunchAgents/`
 
 ### Old Lightroom Catalogs detectie
 Bij grote Lightroom versie updates maakt Adobe een "Old Lightroom Catalogs" map aan met een backup van de oude catalogus. De app:
 1. Zoekt automatisch naar deze map in de buurt van de backup locatie
 2. Als gevonden én ouder dan 1 maand, toont een waarschuwingsblokje
 3. Gebruiker kan de map met één klik verwijderen
-4. De map is klikbaar om in Verkenner te openen
+4. De map is klikbaar om in Verkenner/Finder te openen
 
 ### Startup Cleanup Flow
 1. App start met `--auto-cleanup` argument
-2. Window wordt verborgen (`Visibility.Hidden`, `ShowInTaskbar = false`)
-3. Na `ContentRendered` event wordt cleanup gestart
-4. Backups worden gescand en verouderde backups verwijderd
-5. Resultaat wordt gelogd naar `%APPDATA%\LightroomBackupCleaner\startup-cleanup.log`
-6. App sluit af
+2. Window wordt verborgen
+3. Backups worden gescand en verouderde backups verwijderd
+4. Resultaat wordt gelogd naar settings directory
+5. App sluit af
 
 ## Meertaligheid
 
@@ -114,10 +131,12 @@ Bij grote Lightroom versie updates maakt Adobe een "Old Lightroom Catalogs" map 
 - Async void alleen voor event handlers
 - `_` prefix voor private fields
 - Null-coalescing en null-conditional operators waar passend
+- Avalonia XAML met `.axaml` extensie
 
 ## UI/UX richtlijnen
 
 ### Kleuren (donker thema - Lightroom stijl)
+Gedefinieerd in `Styles/AppStyles.axaml`:
 - Primary: #1A1A1A (zeer donker)
 - Secondary: #2D2D2D (donkergrijs)
 - Accent: #0EA5E9 (Lightroom blauw)
@@ -134,13 +153,15 @@ Bij grote Lightroom versie updates maakt Adobe een "Old Lightroom Catalogs" map 
 - ✓ (wit op groen): Backup wordt behouden
 - ✕ (wit op rood): Backup wordt verwijderd bij opruiming
 
-### Custom styles
-- `DarkScrollBar` - Donkere scrollbar passend bij thema
-- Alle vensters gebruiken consistent hetzelfde app icoon
+### Avalonia Styles
+- `Button.primary`, `Button.secondary`, `Button.danger`, `Button.small`, `Button.icon`
+- `Border.card` - Card styling voor secties
+- `CheckBox.modern` - Moderne checkbox styling
+- `TextBlock.clickable`, `TextBlock.link` - Klikbare teksten
 
 ## Bekende beperkingen
 
-1. Scheduled task vereist dat gebruiker ingelogd is
+1. System tray alleen op Windows
 2. Geen undo functionaliteit na verwijderen
 3. Ondersteunt slechts één backup locatie tegelijk
 4. Taalwisseling vereist herstart van instellingen venster
@@ -152,31 +173,40 @@ Bij wijzigingen, test:
 2. Meerdere backup locaties gevonden - keuze dialoog
 3. Scan met veel backups - voortgang en responsiviteit
 4. Wijzigen van instellingen - herberekening "te verwijderen"
-5. Minimaliseren met auto-cleanup aan - system tray
-6. Sluiten met auto-cleanup aan - moet naar tray gaan
-7. Windows startup cleanup - start met `--auto-cleanup`, check log file
-8. Taalwisseling - Nederlands ↔ Engels
-9. Klik op backup pad - opent Verkenner
-10. Preview window - toont correct icoon, één bevestiging
+5. Windows startup cleanup - start met `--auto-cleanup`, check log file
+6. Taalwisseling - Nederlands ↔ Engels
+7. Klik op backup pad - opent Verkenner/Finder
+8. Preview window - toont correct icoon, één bevestiging
+9. Test op zowel Windows als macOS
 
 ## Dependencies
 
-- Newtonsoft.Json (settings serialization)
-- System.Drawing.Common (icon generation)
-- Windows Forms (FolderBrowserDialog, NotifyIcon)
+- **Avalonia** (11.x) - Cross-platform UI framework
+- **Avalonia.Desktop** - Desktop platform support
+- **Avalonia.Themes.Fluent** - Fluent theme
+- **Newtonsoft.Json** - Settings serialization
+- **SkiaSharp** (2.88.9) - Cross-platform icon generation
 
 ## Publishing
 
-Self-contained single-file executable:
+Self-contained single-file executables:
+
 ```bash
-dotnet publish -c Release -o publish
+# Windows
+dotnet publish -c Release -r win-x64 -o publish/win-x64
+
+# macOS Intel
+dotnet publish -c Release -r osx-x64 -o publish/osx-x64
+
+# macOS Apple Silicon
+dotnet publish -c Release -r osx-arm64 -o publish/osx-arm64
 ```
 
-Resultaat: `publish/LightroomBackupCleaner.exe` (~80MB, bevat .NET runtime)
+Resultaat: Platform-specifieke executable (~80-100MB, bevat .NET runtime)
 
 Project settings in `.csproj`:
-- `PublishSingleFile` - Alles in één exe
+- `PublishSingleFile` - Alles in één executable
 - `SelfContained` - .NET runtime inbegrepen
-- `IncludeNativeLibrariesForSelfExtract` - Native DLLs inbegrepen
+- `IncludeNativeLibrariesForSelfExtract` - Native libraries inbegrepen
 - `EnableCompressionInSingleFile` - Kleinere bestandsgrootte
-- `ApplicationIcon` - app.ico voor Verkenner icoon
+- `ApplicationIcon` - app.ico voor Windows Verkenner icoon

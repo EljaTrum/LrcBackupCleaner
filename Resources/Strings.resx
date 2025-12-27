@@ -399,5 +399,11 @@ This action cannot be undone!</value>
   <data name="Error" xml:space="preserve">
     <value>Error</value>
   </data>
+  <data name="WillBeDeleted" xml:space="preserve">
+    <value>Will be deleted</value>
+  </data>
+  <data name="WillBeKept" xml:space="preserve">
+    <value>Will be kept</value>
+  </data>
 </root>
 

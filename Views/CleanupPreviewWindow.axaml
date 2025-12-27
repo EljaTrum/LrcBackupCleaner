@@ -1,0 +1,106 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="750" d:DesignHeight="550"
+        x:Class="BackupCleaner.CleanupPreviewWindow"
+        Title="Te Verwijderen Backups - Preview"
+        Width="750" Height="550"
+        MinWidth="600" MinHeight="400"
+        Background="{StaticResource BackgroundBrush}"
+        WindowStartupLocation="CenterOwner">
+
+    <Grid Margin="24" RowDefinitions="Auto,*,Auto">
+
+        <!-- Header -->
+        <Border Grid.Row="0" Classes="card" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="⚠️ Te Verwijderen Backups" 
+                           FontSize="20" 
+                           FontWeight="Bold" 
+                           Foreground="{StaticResource WarningBrush}"/>
+                <TextBlock x:Name="txtSummary" 
+                           FontSize="14" 
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           Margin="0,8,0,0"/>
+                <TextBlock x:Name="txtWarningText"
+                           Text="Controleer onderstaande backups voordat je ze definitief verwijdert." 
+                           FontSize="13" 
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           Margin="0,4,0,0"
+                           FontStyle="Italic"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Backup List -->
+        <Border Grid.Row="1" Classes="card" Margin="0,0,0,16">
+            <Grid RowDefinitions="Auto,*">
+                
+                <!-- List Header -->
+                <Grid Grid.Row="0" Margin="0,0,0,12" ColumnDefinitions="*,150,100">
+                    <TextBlock Grid.Column="0" Text="Backup Map" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBlock Grid.Column="1" Text="Backup Datum" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBlock Grid.Column="2" Text="Grootte" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Right"/>
+                </Grid>
+                
+                <!-- List Content -->
+                <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="lstFiles">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="{StaticResource BorderBrush}" 
+                                        BorderThickness="0,0,0,1" 
+                                        Padding="0,10"
+                                        Margin="0,2">
+                                    <Grid ColumnDefinitions="*,150,100">
+                                        <TextBlock Grid.Column="0" 
+                                                   Text="{Binding FileName}" 
+                                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                                   FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   ToolTip.Tip="{Binding FilePath}"/>
+                                        
+                                        <TextBlock Grid.Column="1" 
+                                                   Text="{Binding BackupDateFormatted}" 
+                                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        
+                                        <TextBlock Grid.Column="2" 
+                                                   Text="{Binding SizeFormatted}" 
+                                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                                   TextAlignment="Right"
+                                                   FontWeight="SemiBold"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- Buttons -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto">
+            
+            <TextBlock Grid.Column="0" 
+                       x:Name="txtWarning"
+                       Text="🔴 Let op: Deze actie kan niet ongedaan worden gemaakt!"
+                       Foreground="{StaticResource DangerBrush}"
+                       VerticalAlignment="Center"
+                       FontWeight="SemiBold"/>
+            
+            <Button Grid.Column="1" 
+                    x:Name="btnCancel"
+                    Content="Annuleren" 
+                    Click="BtnCancel_Click"
+                    Classes="secondary"
+                    Margin="0,0,12,0"/>
+            
+            <Button Grid.Column="2" 
+                    x:Name="btnConfirm"
+                    Content="🗑️ Definitief Verwijderen" 
+                    Click="BtnConfirm_Click"
+                    Classes="danger"/>
+        </Grid>
+    </Grid>
+</Window>
+

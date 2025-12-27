@@ -77,17 +77,30 @@ namespace BackupCleaner.Services
             if (!string.IsNullOrEmpty(userProfile))
             {
                 paths.Add(Path.Combine(userProfile, "Lightroom"));
+                
+                // macOS-specifieke locaties
+                if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
+                    System.Runtime.InteropServices.OSPlatform.OSX))
+                {
+                    paths.Add(Path.Combine(userProfile, "Pictures", "Lightroom"));
+                    paths.Add(Path.Combine(userProfile, "Pictures", "Lightroom Catalog"));
+                    paths.Add(Path.Combine(userProfile, "Pictures", "Lightroom Catalogs"));
+                }
             }
 
-            // Alle vaste schijven doorzoeken voor Lightroom mappen
-            foreach (var drive in DriveInfo.GetDrives())
+            // Alle vaste schijven doorzoeken voor Lightroom mappen (alleen op Windows/Linux)
+            if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
+                System.Runtime.InteropServices.OSPlatform.OSX))
             {
-                if (drive.DriveType == DriveType.Fixed && drive.IsReady)
+                foreach (var drive in DriveInfo.GetDrives())
                 {
-                    paths.Add(Path.Combine(drive.RootDirectory.FullName, "Lightroom"));
-                    paths.Add(Path.Combine(drive.RootDirectory.FullName, "Lightroom Catalog"));
-                    paths.Add(Path.Combine(drive.RootDirectory.FullName, "Lightroom Catalogs"));
-                    paths.Add(Path.Combine(drive.RootDirectory.FullName, "Adobe", "Lightroom"));
+                    if (drive.DriveType == DriveType.Fixed && drive.IsReady)
+                    {
+                        paths.Add(Path.Combine(drive.RootDirectory.FullName, "Lightroom"));
+                        paths.Add(Path.Combine(drive.RootDirectory.FullName, "Lightroom Catalog"));
+                        paths.Add(Path.Combine(drive.RootDirectory.FullName, "Lightroom Catalogs"));
+                        paths.Add(Path.Combine(drive.RootDirectory.FullName, "Adobe", "Lightroom"));
+                    }
                 }
             }
             

@@ -1,0 +1,237 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="550" d:DesignHeight="580"
+        x:Class="BackupCleaner.SettingsWindow"
+        Title="Instellingen - Lightroom Classic Backup Cleaner"
+        Width="550" Height="580"
+        MinWidth="500" MinHeight="400"
+        Background="{StaticResource BackgroundBrush}"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True">
+
+    <Grid Margin="24" RowDefinitions="Auto,*,Auto">
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="⚙️ Instellingen" 
+                       FontSize="24" 
+                       FontWeight="Bold" 
+                       Foreground="{StaticResource TextPrimaryBrush}"/>
+            <TextBlock Text="Configureer automatische opruiming" 
+                       FontSize="14" 
+                       Foreground="{StaticResource TextSecondaryBrush}"
+                       Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Settings Content -->
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="16" Margin="0,0,20,0">
+                
+                <!-- Automatisch opruimen sectie -->
+                <Border Classes="card">
+                    <StackPanel>
+                        <TextBlock x:Name="txtAutoCleanupTitle" 
+                                   Text="🕐 Automatisch opruimen" 
+                                   FontSize="16" 
+                                   FontWeight="SemiBold" 
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,8"/>
+                        
+                        <TextBlock x:Name="txtAutoCleanupDescription" 
+                                   Text="Wanneer ingeschakeld, ruimt de applicatie dagelijks automatisch oude Lightroom backups op." 
+                                   TextWrapping="Wrap"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,16"/>
+                        
+                        <CheckBox x:Name="chkAutoCleanup" 
+                                  Content="Automatisch dagelijks opruimen"
+                                  Classes="modern"
+                                  IsCheckedChanged="ChkAutoCleanup_Changed"/>
+                        
+                        <!-- Tijdstip instelling -->
+                        <StackPanel x:Name="timeSettings" 
+                                    Orientation="Horizontal" 
+                                    Margin="30,16,0,0"
+                                    IsVisible="False">
+                            <TextBlock x:Name="txtCleanupAtLabel" 
+                                       Text="Opruimen om:" 
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       Margin="0,0,12,0"/>
+                            <Border Background="{StaticResource SecondaryBrush}" 
+                                    CornerRadius="4" 
+                                    BorderBrush="{StaticResource BorderBrush}" 
+                                    BorderThickness="1"
+                                    Padding="8,4">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="−" 
+                                            Click="BtnDecreaseHour_Click" 
+                                            Width="28" Height="28"
+                                            Classes="icon"/>
+                                    <TextBlock x:Name="txtCleanupHour" 
+                                               Text="02:00" 
+                                               Width="50" 
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource TextPrimaryBrush}"
+                                               FontWeight="SemiBold"
+                                               FontSize="15"/>
+                                    <Button Content="+" 
+                                            Click="BtnIncreaseHour_Click" 
+                                            Width="28" Height="28"
+                                            Classes="icon"/>
+                                </StackPanel>
+                            </Border>
+                            <TextBlock x:Name="txtHourLabel" 
+                                       Text="uur" 
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       Margin="8,0,0,0"/>
+                        </StackPanel>
+                        
+                        <TextBlock x:Name="txtAutoCleanupInfo" 
+                                   Text="" 
+                                   FontSize="12" 
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="30,12,0,0"
+                                   IsVisible="False"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Starten bij systeem start sectie -->
+                <Border Classes="card">
+                    <StackPanel>
+                        <TextBlock x:Name="txtStartupTitle" 
+                                   Text="🚀 Starten bij opstarten" 
+                                   FontSize="16" 
+                                   FontWeight="SemiBold" 
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,8"/>
+                        
+                        <TextBlock x:Name="txtStartupDescription" 
+                                   Text="Start de applicatie automatisch wanneer het systeem opstart, voer de opruiming uit en sluit daarna weer af." 
+                                   TextWrapping="Wrap"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,16"/>
+                        
+                        <CheckBox x:Name="chkRunAtStartup" 
+                                  Content="Opruimen bij opstarten"
+                                  Classes="modern"
+                                  IsCheckedChanged="ChkRunAtStartup_Changed"/>
+                        
+                        <TextBlock x:Name="txtStartupInfo" 
+                                   Text="✓ De app start automatisch, ruimt op en sluit weer af" 
+                                   FontSize="12" 
+                                   Foreground="{StaticResource SuccessBrush}"
+                                   Margin="30,12,0,0"
+                                   IsVisible="False"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Taal sectie -->
+                <Border Classes="card">
+                    <StackPanel>
+                        <TextBlock x:Name="txtLanguageTitle" 
+                                   Text="🌐 Taal" 
+                                   FontSize="16" 
+                                   FontWeight="SemiBold" 
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,8"/>
+                        
+                        <TextBlock x:Name="txtLanguageDescription" 
+                                   Text="Kies je voorkeurstaal. De app moet opnieuw opstarten om de wijziging toe te passen." 
+                                   TextWrapping="Wrap"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,16"/>
+                        
+                        <StackPanel Spacing="8">
+                            <RadioButton x:Name="rbLanguageAuto" 
+                                         GroupName="Language"
+                                         IsCheckedChanged="LanguageOption_Changed"
+                                         Foreground="{StaticResource TextPrimaryBrush}">
+                                <TextBlock x:Name="txtLangAuto" Text="Automatisch (systeemtaal)"/>
+                            </RadioButton>
+                            
+                            <RadioButton x:Name="rbLanguageEnglish" 
+                                         GroupName="Language"
+                                         IsCheckedChanged="LanguageOption_Changed"
+                                         Foreground="{StaticResource TextPrimaryBrush}">
+                                <TextBlock Text="English"/>
+                            </RadioButton>
+                            
+                            <RadioButton x:Name="rbLanguageDutch" 
+                                         GroupName="Language"
+                                         IsCheckedChanged="LanguageOption_Changed"
+                                         Foreground="{StaticResource TextPrimaryBrush}">
+                                <TextBlock Text="Nederlands"/>
+                            </RadioButton>
+                        </StackPanel>
+                        
+                        <TextBlock x:Name="txtLanguageInfo" 
+                                   Text="" 
+                                   FontSize="12" 
+                                   Foreground="{StaticResource WarningBrush}"
+                                   Margin="0,12,0,0"
+                                   IsVisible="False"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Over sectie -->
+                <Border Classes="card">
+                    <StackPanel>
+                        <TextBlock x:Name="txtAboutTitle" 
+                                   Text="ℹ️ Over deze applicatie" 
+                                   FontSize="16" 
+                                   FontWeight="SemiBold" 
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,8"/>
+                        
+                        <TextBlock x:Name="txtAboutDescription1"
+                                   Text="Lightroom Classic Backup Cleaner helpt je oude catalogus backups van Adobe Lightroom Classic automatisch op te ruimen."
+                                   TextWrapping="Wrap"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   LineHeight="22"/>
+                        
+                        <Border Background="{StaticResource SecondaryBrush}" 
+                                CornerRadius="6" 
+                                Padding="12" 
+                                Margin="0,16,0,0">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock x:Name="txtMadeBy"
+                                               Text="Gemaakt door " 
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Text="Photofacts Academy" 
+                                               Classes="link"
+                                               VerticalAlignment="Center"
+                                               PointerPressed="PhotofactsLink_Click"/>
+                                </StackPanel>
+                                <TextBlock x:Name="txtVersion"
+                                           Text="Versie: 0.2.0" 
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           FontSize="12"
+                                           Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer -->
+        <Border Grid.Row="2" Margin="0,16,0,0">
+            <Button x:Name="btnClose"
+                    Content="Sluiten" 
+                    Click="BtnClose_Click"
+                    Classes="primary"
+                    HorizontalAlignment="Right"
+                    MinWidth="100"/>
+        </Border>
+    </Grid>
+</Window>
+

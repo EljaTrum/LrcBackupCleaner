@@ -2,39 +2,56 @@
 
 🇬🇧 [English version](README.md)
 
-Een Windows applicatie voor het automatisch beheren en opruimen van Adobe Lightroom Classic catalogus backups.
+Een cross-platform applicatie voor het automatisch beheren en opruimen van Adobe Lightroom Classic catalogus backups.
 
 ![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4)
 ![Windows](https://img.shields.io/badge/Platform-Windows-0078D6)
+![macOS](https://img.shields.io/badge/Platform-macOS-000000)
+![Avalonia](https://img.shields.io/badge/UI-Avalonia-8B44AC)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ## 📸 Functionaliteiten
 
+- **Cross-platform** - Werkt op Windows en macOS (Intel & Apple Silicon)
 - **Automatische detectie** - Vindt automatisch je Lightroom backup locatie
 - **Overzichtelijke lijst** - Bekijk al je backups met datum, leeftijd en grootte
 - **Slimme opruiming** - Behoud de nieuwste X backups, verwijder alleen oude
 - **Minimale leeftijd** - Backups jonger dan X maanden worden nooit verwijderd
 - **Automatische opruiming** - Dagelijks op een instelbaar tijdstip
-- **Opruimen bij Windows start** - Automatisch opschonen bij opstarten PC
+- **Opruimen bij opstarten** - Automatisch opschonen bij opstarten systeem
 - **Oude versie backup detectie** - Detecteert en verwijdert "Old Lightroom Catalogs" mappen
-- **System tray** - Draait op de achtergrond
+- **System tray** - Draait op de achtergrond (Windows)
 - **Meertalig** - Nederlands en Engels, met automatische taaldetectie
 - **Self-contained** - Geen .NET runtime installatie nodig
 
 ## 🚀 Installatie
 
 ### Voorgecompileerde versie
-Download `LightroomBackupCleaner.zip` via onderstaande link, pak de .exe uit en plaats deze waar je wilt. De applicatie is self-contained en heeft geen extra installatie nodig.
-Link: https://photofactsacademy.s3.eu-west-1.amazonaws.com/LightroomBackupCleaner.zip
+
+Download de juiste versie voor je platform:
+
+| Platform | Download |
+|----------|----------|
+| Windows (x64) | [LightroomBackupCleaner-win.zip](https://photofactsacademy.s3.eu-west-1.amazonaws.com/LightroomBackupCleaner-win.zip) |
+| macOS (Intel) | [LightroomBackupCleaner-osx-x64.zip](https://photofactsacademy.s3.eu-west-1.amazonaws.com/LightroomBackupCleaner-osx-x64.zip) |
+| macOS (Apple Silicon) | [LightroomBackupCleaner-osx-arm64.zip](https://photofactsacademy.s3.eu-west-1.amazonaws.com/LightroomBackupCleaner-osx-arm64.zip) |
+
+Pak uit en start de applicatie. De applicatie is self-contained en heeft geen extra installatie nodig.
 
 ### Bouwen vanuit broncode
 ```bash
 git clone https://github.com/EljaTrum/LrcBackupCleaner.git
 cd LrcBackupCleaner
-dotnet publish -c Release -o publish
-```
 
-De applicatie wordt gebouwd naar de `publish/` map als een enkel exe-bestand.
+# Windows
+dotnet publish -c Release -r win-x64 -o publish/win-x64
+
+# macOS Intel
+dotnet publish -c Release -r osx-x64 -o publish/osx-x64
+
+# macOS Apple Silicon
+dotnet publish -c Release -r osx-arm64 -o publish/osx-arm64
+```
 
 ## 📖 Gebruik
 
@@ -51,7 +68,7 @@ De backup lijst toont alle gevonden backups met:
 - **Grootte** - Totale grootte van de backup
 - **Status** - ✓ (behouden) of ✕ (verwijderen)
 
-Klik op het backup pad bovenin om de map in Verkenner te openen.
+Klik op het backup pad bovenin om de map te openen in je bestandsbeheerder.
 
 ### Instellingen
 
@@ -65,19 +82,19 @@ Klik op het backup pad bovenin om de map in Verkenner te openen.
 1. Klik op "⚙️ Instellingen"
 2. Schakel "Automatisch dagelijks opruimen" in
 3. Stel het gewenste tijdstip in
-4. De app maakt een Windows Scheduled Task aan
+4. De app maakt een geplande taak aan (Windows Task Scheduler / macOS launchd)
 
-### Opruimen bij Windows start
+### Opruimen bij opstarten
 1. Klik op "⚙️ Instellingen"
-2. Schakel "Opruimen bij Windows start" in
-3. Bij elke Windows start worden oude backups automatisch verwijderd
+2. Schakel "Opruimen bij opstarten" in
+3. Bij elke systeemstart worden oude backups automatisch verwijderd
 4. De app sluit daarna weer af (draait niet permanent)
 
 ### Oude Lightroom versie backups
 Wanneer Lightroom Classic een grote versie-update krijgt, maakt Adobe automatisch een backup van je oude catalogus in een map genaamd "Old Lightroom Catalogs". De app detecteert deze map automatisch en:
 - Toont een waarschuwing als de map ouder is dan 1 maand
 - Laat je de map met één klik verwijderen
-- De maplocatie is klikbaar om te openen in Verkenner
+- De maplocatie is klikbaar om te openen in je bestandsbeheerder
 
 Dit helpt je om na een succesvolle update de oude catalogusbestanden op te ruimen.
 
@@ -88,7 +105,6 @@ De applicatie heeft een donker thema geïnspireerd door Adobe Lightroom Classic:
 - Donkere achtergrond (#121212)
 - Accent kleur blauw (#0EA5E9)
 - Duidelijke status indicatoren (✓ groen / ✕ rood)
-- Custom donkere scrollbars
 
 ## 📁 Lightroom Backup Structuur
 
@@ -108,48 +124,58 @@ De app herkent dit formaat automatisch en ondersteunt zowel `.lrcat` als `.zip` 
 ## ⚙️ Configuratie
 
 Instellingen worden opgeslagen in:
-```
-%APPDATA%\LightroomBackupCleaner\settings.json
-```
 
-Startup cleanup logging wordt opgeslagen in:
-```
-%APPDATA%\LightroomBackupCleaner\startup-cleanup.log
-```
+| Platform | Locatie |
+|----------|---------|
+| Windows | `%APPDATA%\LightroomBackupCleaner\settings.json` |
+| macOS | `~/Library/Application Support/LightroomBackupCleaner/settings.json` |
 
 ## 🔧 Ontwikkeling
 
+### Technologie Stack
+- **.NET 8** - Cross-platform runtime
+- **Avalonia UI** - Cross-platform UI framework
+- **SkiaSharp** - Cross-platform graphics voor icoon generatie
+
 ### Projectstructuur
 ```
-├── MainWindow.xaml/.cs          # Hoofdvenster
-├── SettingsWindow.xaml/.cs      # Instellingen dialoog
-├── CleanupPreviewWindow.xaml/.cs # Preview voor verwijderen
+├── Views/
+│   ├── MainWindow.axaml/.cs         # Hoofdvenster
+│   ├── SettingsWindow.axaml/.cs     # Instellingen dialoog
+│   └── CleanupPreviewWindow.axaml/.cs # Preview voor verwijderen
+├── ViewModels/
+│   └── LightroomBackupViewModel.cs  # Backup lijst item ViewModel
 ├── Models/
-│   ├── LightroomBackup.cs       # Backup model
-│   └── FileToDelete.cs          # Te verwijderen bestand model
+│   ├── LightroomBackup.cs           # Backup model
+│   └── FileToDelete.cs              # Te verwijderen bestand model
 ├── Services/
-│   ├── BackupService.cs         # Backup scan/delete logica
-│   ├── LightroomDetectionService.cs  # Auto-detectie
-│   ├── SettingsService.cs       # Settings opslag
-│   └── LocalizationService.cs   # Meertaligheid
+│   ├── BackupService.cs             # Backup scan/delete logica
+│   ├── LightroomDetectionService.cs # Auto-detectie
+│   ├── SettingsService.cs           # Settings opslag
+│   ├── LocalizationService.cs       # Meertaligheid
+│   └── Platform/
+│       ├── IPlatformServices.cs     # Platform abstractie
+│       ├── WindowsServices.cs       # Windows-specifieke features
+│       └── MacOSServices.cs         # macOS-specifieke features
+├── Styles/
+│   └── AppStyles.axaml              # UI styles en kleuren
 ├── Resources/
-│   ├── Strings.resx             # Engelse vertalingen
-│   └── Strings.nl.resx          # Nederlandse vertalingen
-├── IconGenerator.cs             # App icoon generatie
-└── app.ico                      # Ingebakken app icoon
+│   ├── Strings.resx                 # Engelse vertalingen
+│   └── Strings.nl.resx              # Nederlandse vertalingen
+├── Assets/
+│   └── app.ico                      # Applicatie icoon
+├── App.axaml/.cs                    # Applicatie entry
+├── Program.cs                       # Main entry point
+└── IconGenerator.cs                 # App icoon generatie (SkiaSharp)
 ```
 
 ### Bouwen
 ```bash
-dotnet build                    # Debug build
-dotnet publish -c Release -o publish  # Release single-file exe
+dotnet build                                        # Debug build
+dotnet publish -c Release -r win-x64 -o publish     # Windows release
+dotnet publish -c Release -r osx-x64 -o publish     # macOS Intel release
+dotnet publish -c Release -r osx-arm64 -o publish   # macOS ARM release
 ```
-
-### Icoon regenereren
-Als je het app icoon wilt aanpassen:
-1. Wijzig `IconGenerator.cs`
-2. Run tijdelijk met `--generate-icon` argument
-3. Herbouw het project
 
 ## 📄 Licentie
 

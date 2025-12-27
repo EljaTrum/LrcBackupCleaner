@@ -399,5 +399,11 @@ Deze actie kan niet ongedaan gemaakt worden!</value>
   <data name="Error" xml:space="preserve">
     <value>Fout</value>
   </data>
+  <data name="WillBeDeleted" xml:space="preserve">
+    <value>Wordt verwijderd</value>
+  </data>
+  <data name="WillBeKept" xml:space="preserve">
+    <value>Wordt bewaard</value>
+  </data>
 </root>
 

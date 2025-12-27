@@ -2,39 +2,56 @@
 
 🇳🇱 [Nederlandse versie](README.nl.md)
 
-A Windows application for automatically managing and cleaning up Adobe Lightroom Classic catalog backups.
+A cross-platform application for automatically managing and cleaning up Adobe Lightroom Classic catalog backups.
 
 ![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4)
 ![Windows](https://img.shields.io/badge/Platform-Windows-0078D6)
+![macOS](https://img.shields.io/badge/Platform-macOS-000000)
+![Avalonia](https://img.shields.io/badge/UI-Avalonia-8B44AC)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ## 📸 Features
 
+- **Cross-platform** - Works on Windows and macOS (Intel & Apple Silicon)
 - **Automatic detection** - Automatically finds your Lightroom backup location
 - **Clear overview** - View all backups with date, age, and size
 - **Smart cleanup** - Keep the newest X backups, only delete old ones
 - **Minimum age** - Backups younger than X months are never deleted
 - **Automatic cleanup** - Daily at a configurable time
-- **Cleanup at Windows startup** - Automatic cleanup when your PC starts
+- **Cleanup at startup** - Automatic cleanup when your system starts
 - **Old version backup detection** - Detects and removes "Old Lightroom Catalogs" folders
-- **System tray** - Runs in the background
+- **System tray** - Runs in the background (Windows)
 - **Multilingual** - Dutch and English, with automatic language detection
 - **Self-contained** - No .NET runtime installation required
 
 ## 🚀 Installation
 
 ### Pre-compiled version
-Download `LightroomBackupCleaner.zip` via the link below, extract the .exe and place it wherever you like. The application is self-contained and requires no additional installation.
-Link: https://photofactsacademy.s3.eu-west-1.amazonaws.com/LightroomBackupCleaner.zip
+
+Download the appropriate version for your platform:
+
+| Platform | Download |
+|----------|----------|
+| Windows (x64) | [LightroomBackupCleaner-win.zip](https://photofactsacademy.s3.eu-west-1.amazonaws.com/LightroomBackupCleaner-win.zip) |
+| macOS (Intel) | [LightroomBackupCleaner-osx-x64.zip](https://photofactsacademy.s3.eu-west-1.amazonaws.com/LightroomBackupCleaner-osx-x64.zip) |
+| macOS (Apple Silicon) | [LightroomBackupCleaner-osx-arm64.zip](https://photofactsacademy.s3.eu-west-1.amazonaws.com/LightroomBackupCleaner-osx-arm64.zip) |
+
+Extract and run the application. It's self-contained and requires no additional installation.
 
 ### Build from source
 ```bash
 git clone https://github.com/EljaTrum/LrcBackupCleaner.git
 cd LrcBackupCleaner
-dotnet publish -c Release -o publish
-```
 
-The application is built to the `publish/` folder as a single exe file.
+# Windows
+dotnet publish -c Release -r win-x64 -o publish/win-x64
+
+# macOS Intel
+dotnet publish -c Release -r osx-x64 -o publish/osx-x64
+
+# macOS Apple Silicon
+dotnet publish -c Release -r osx-arm64 -o publish/osx-arm64
+```
 
 ## 📖 Usage
 
@@ -51,7 +68,7 @@ The backup list shows all found backups with:
 - **Size** - Total size of the backup
 - **Status** - ✓ (keep) or ✕ (delete)
 
-Click on the backup path at the top to open the folder in Explorer.
+Click on the backup path at the top to open the folder in your file manager.
 
 ### Settings
 
@@ -65,19 +82,19 @@ Click on the backup path at the top to open the folder in Explorer.
 1. Click "⚙️ Settings"
 2. Enable "Automatic daily cleanup"
 3. Set the desired time
-4. The app creates a Windows Scheduled Task
+4. The app creates a scheduled task (Windows Task Scheduler / macOS launchd)
 
-### Cleanup at Windows startup
+### Cleanup at startup
 1. Click "⚙️ Settings"
-2. Enable "Cleanup at Windows startup"
-3. At each Windows startup, old backups are automatically deleted
+2. Enable "Cleanup at startup"
+3. At each system startup, old backups are automatically deleted
 4. The app then closes (doesn't run permanently)
 
 ### Old Lightroom version backups
 When Lightroom Classic receives a major version update, Adobe automatically creates a backup of your old catalog in a folder called "Old Lightroom Catalogs". The app automatically detects this folder and:
 - Shows a warning if the folder is older than 1 month
 - Lets you delete the folder with one click
-- The folder location is clickable to open in Explorer
+- The folder location is clickable to open in your file manager
 
 This helps you clean up old catalog files after a successful update.
 
@@ -88,7 +105,6 @@ The application has a dark theme inspired by Adobe Lightroom Classic:
 - Dark background (#121212)
 - Accent color blue (#0EA5E9)
 - Clear status indicators (✓ green / ✕ red)
-- Custom dark scrollbars
 
 ## 📁 Lightroom Backup Structure
 
@@ -108,48 +124,58 @@ The app automatically recognizes this format and supports both `.lrcat` and `.zi
 ## ⚙️ Configuration
 
 Settings are stored in:
-```
-%APPDATA%\LightroomBackupCleaner\settings.json
-```
 
-Startup cleanup logging is stored in:
-```
-%APPDATA%\LightroomBackupCleaner\startup-cleanup.log
-```
+| Platform | Location |
+|----------|----------|
+| Windows | `%APPDATA%\LightroomBackupCleaner\settings.json` |
+| macOS | `~/Library/Application Support/LightroomBackupCleaner/settings.json` |
 
 ## 🔧 Development
 
+### Technology Stack
+- **.NET 8** - Cross-platform runtime
+- **Avalonia UI** - Cross-platform UI framework
+- **SkiaSharp** - Cross-platform graphics for icon generation
+
 ### Project structure
 ```
-├── MainWindow.xaml/.cs          # Main window
-├── SettingsWindow.xaml/.cs      # Settings dialog
-├── CleanupPreviewWindow.xaml/.cs # Preview for deletion
+├── Views/
+│   ├── MainWindow.axaml/.cs         # Main window
+│   ├── SettingsWindow.axaml/.cs     # Settings dialog
+│   └── CleanupPreviewWindow.axaml/.cs # Preview for deletion
+├── ViewModels/
+│   └── LightroomBackupViewModel.cs  # Backup list item ViewModel
 ├── Models/
-│   ├── LightroomBackup.cs       # Backup model
-│   └── FileToDelete.cs          # File to delete model
+│   ├── LightroomBackup.cs           # Backup model
+│   └── FileToDelete.cs              # File to delete model
 ├── Services/
-│   ├── BackupService.cs         # Backup scan/delete logic
-│   ├── LightroomDetectionService.cs  # Auto-detection
-│   ├── SettingsService.cs       # Settings storage
-│   └── LocalizationService.cs   # Multilingual support
+│   ├── BackupService.cs             # Backup scan/delete logic
+│   ├── LightroomDetectionService.cs # Auto-detection
+│   ├── SettingsService.cs           # Settings storage
+│   ├── LocalizationService.cs       # Multilingual support
+│   └── Platform/
+│       ├── IPlatformServices.cs     # Platform abstraction
+│       ├── WindowsServices.cs       # Windows-specific features
+│       └── MacOSServices.cs         # macOS-specific features
+├── Styles/
+│   └── AppStyles.axaml              # UI styles and colors
 ├── Resources/
-│   ├── Strings.resx             # English translations
-│   └── Strings.nl.resx          # Dutch translations
-├── IconGenerator.cs             # App icon generation
-└── app.ico                      # Embedded app icon
+│   ├── Strings.resx                 # English translations
+│   └── Strings.nl.resx              # Dutch translations
+├── Assets/
+│   └── app.ico                      # Application icon
+├── App.axaml/.cs                    # Application entry
+├── Program.cs                       # Main entry point
+└── IconGenerator.cs                 # App icon generation (SkiaSharp)
 ```
 
 ### Building
 ```bash
-dotnet build                    # Debug build
-dotnet publish -c Release -o publish  # Release single-file exe
+dotnet build                                        # Debug build
+dotnet publish -c Release -r win-x64 -o publish     # Windows release
+dotnet publish -c Release -r osx-x64 -o publish     # macOS Intel release
+dotnet publish -c Release -r osx-arm64 -o publish   # macOS ARM release
 ```
-
-### Regenerate icon
-If you want to customize the app icon:
-1. Modify `IconGenerator.cs`
-2. Temporarily run with `--generate-icon` argument
-3. Rebuild the project
 
 ## 📄 License
 
