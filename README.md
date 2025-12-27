@@ -39,19 +39,46 @@ Download the appropriate version for your platform:
 Extract and run the application. It's self-contained and requires no additional installation.
 
 ### Build from source
+
+#### Windows
+```bash
+git clone https://github.com/EljaTrum/LrcBackupCleaner.git
+cd LrcBackupCleaner
+dotnet publish -c Release -r win-x64 -o publish/win-x64
+```
+
+#### macOS (with code signing and DMG)
+For macOS, use the build script to create a properly signed .app bundle and DMG:
+
 ```bash
 git clone https://github.com/EljaTrum/LrcBackupCleaner.git
 cd LrcBackupCleaner
 
-# Windows
-dotnet publish -c Release -r win-x64 -o publish/win-x64
+# Make script executable
+chmod +x build-macos.sh
 
-# macOS Intel
-dotnet publish -c Release -r osx-x64 -o publish/osx-x64
+# Build for Apple Silicon (M1/M2/M3)
+./build-macos.sh osx-arm64
 
-# macOS Apple Silicon
-dotnet publish -c Release -r osx-arm64 -o publish/osx-arm64
+# Build for Intel Macs
+./build-macos.sh osx-x64
+
+# Build with code signing (requires Apple Developer account)
+./build-macos.sh osx-arm64 "Developer ID Application: Your Name (TEAM_ID)"
 ```
+
+The script will:
+- Build the application
+- Create a proper `.app` bundle with Info.plist
+- Code sign the app (if identity provided)
+- Create a DMG file for distribution
+
+**Without code signing**: Users will need to remove quarantine attributes:
+```bash
+xattr -dr com.apple.quarantine LightroomBackupCleaner.app
+```
+
+**With code signing**: The app will work without manual steps, and Gatekeeper won't block it.
 
 ## 📖 Usage
 

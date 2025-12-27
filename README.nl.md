@@ -39,19 +39,46 @@ Download de juiste versie voor je platform:
 Pak uit en start de applicatie. De applicatie is self-contained en heeft geen extra installatie nodig.
 
 ### Bouwen vanuit broncode
+
+#### Windows
+```bash
+git clone https://github.com/EljaTrum/LrcBackupCleaner.git
+cd LrcBackupCleaner
+dotnet publish -c Release -r win-x64 -o publish/win-x64
+```
+
+#### macOS (met code signing en DMG)
+Voor macOS, gebruik het build script om een correct ondertekende .app bundle en DMG te maken:
+
 ```bash
 git clone https://github.com/EljaTrum/LrcBackupCleaner.git
 cd LrcBackupCleaner
 
-# Windows
-dotnet publish -c Release -r win-x64 -o publish/win-x64
+# Script uitvoerbaar maken
+chmod +x build-macos.sh
 
-# macOS Intel
-dotnet publish -c Release -r osx-x64 -o publish/osx-x64
+# Build voor Apple Silicon (M1/M2/M3)
+./build-macos.sh osx-arm64
 
-# macOS Apple Silicon
-dotnet publish -c Release -r osx-arm64 -o publish/osx-arm64
+# Build voor Intel Macs
+./build-macos.sh osx-x64
+
+# Build met code signing (vereist Apple Developer account)
+./build-macos.sh osx-arm64 "Developer ID Application: Your Name (TEAM_ID)"
 ```
+
+Het script zal:
+- De applicatie bouwen
+- Een juiste `.app` bundle maken met Info.plist
+- De app code signen (als identity opgegeven)
+- Een DMG bestand maken voor distributie
+
+**Zonder code signing**: Gebruikers moeten quarantine attributen verwijderen:
+```bash
+xattr -dr com.apple.quarantine LightroomBackupCleaner.app
+```
+
+**Met code signing**: De app werkt zonder handmatige stappen en Gatekeeper blokkeert het niet.
 
 ## 📖 Gebruik
 

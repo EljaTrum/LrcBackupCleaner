@@ -181,17 +181,17 @@
     <value>hour</value>
   </data>
   <data name="ScheduledTaskInfo" xml:space="preserve">
-    <value>A Windows Scheduled Task will be created so cleanup works even when the app is not active.</value>
+    <value>A scheduled task will be created so cleanup works even when the app is not active.</value>
   </data>
 
   <data name="StartupTitle" xml:space="preserve">
-    <value>🚀 Start with Windows</value>
+    <value>🚀 Run at startup</value>
   </data>
   <data name="StartupDescription" xml:space="preserve">
-    <value>Start the application automatically when Windows starts, perform cleanup and then close. Ideal if you don't want the app running in the background constantly.</value>
+    <value>Start the application automatically when the computer starts, perform cleanup and then close. Ideal if you don't want the app running in the background constantly.</value>
   </data>
   <data name="StartupCheckbox" xml:space="preserve">
-    <value>Cleanup at Windows startup</value>
+    <value>Cleanup at computer startup</value>
   </data>
   <data name="StartupInfo" xml:space="preserve">
     <value>✓ The app starts automatically, cleans up and closes</value>

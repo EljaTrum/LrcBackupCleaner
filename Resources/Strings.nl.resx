@@ -181,17 +181,17 @@
     <value>uur</value>
   </data>
   <data name="ScheduledTaskInfo" xml:space="preserve">
-    <value>Er wordt een Windows Scheduled Task aangemaakt zodat opruimen ook werkt als de app niet actief is.</value>
+    <value>Er wordt een geplande taak aangemaakt zodat opruimen ook werkt als de app niet actief is.</value>
   </data>
 
   <data name="StartupTitle" xml:space="preserve">
-    <value>🚀 Starten bij Windows</value>
+    <value>🚀 Uitvoeren bij opstarten</value>
   </data>
   <data name="StartupDescription" xml:space="preserve">
-    <value>Start de applicatie automatisch wanneer Windows opstart, voer de opruiming uit en sluit weer af. Ideaal als je de app niet constant op de achtergrond wilt draaien.</value>
+    <value>Start de applicatie automatisch wanneer de computer opstart, voer de opruiming uit en sluit weer af. Ideaal als je de app niet constant op de achtergrond wilt draaien.</value>
   </data>
   <data name="StartupCheckbox" xml:space="preserve">
-    <value>Opruimen bij Windows start</value>
+    <value>Opruimen bij opstarten computer</value>
   </data>
   <data name="StartupInfo" xml:space="preserve">
     <value>✓ De app start automatisch, ruimt op en sluit af</value>
