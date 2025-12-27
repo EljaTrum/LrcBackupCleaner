@@ -159,12 +159,34 @@ echo -e "${GREEN}✓ Build complete!${NC}"
 echo -e "${GREEN}  App bundle: ${APP_DIR}${NC}"
 echo -e "${GREEN}  DMG: ${DMG_PATH}${NC}"
 
+# Notarization (optional, requires Apple Developer account)
+if [[ -n "$SIGNING_IDENTITY" && -n "$APPLE_ID" && -n "$TEAM_ID" && -n "$APP_SPECIFIC_PASSWORD" ]]; then
+    echo ""
+    echo -e "${YELLOW}Notarizing DMG...${NC}"
+    xcrun notarytool submit "${DMG_PATH}" \
+        --apple-id "${APPLE_ID}" \
+        --team-id "${TEAM_ID}" \
+        --password "${APP_SPECIFIC_PASSWORD}" \
+        --wait || echo -e "${YELLOW}Warning: Notarization failed or skipped${NC}"
+    
+    if [[ $? -eq 0 ]]; then
+        echo -e "${YELLOW}Stapling notarization ticket...${NC}"
+        xcrun stapler staple "${DMG_PATH}"
+        echo -e "${GREEN}✓ Notarization complete!${NC}"
+    fi
+elif [[ -n "$SIGNING_IDENTITY" ]]; then
+    echo ""
+    echo -e "${YELLOW}Note: To notarize, set environment variables or create build-macos.config.sh:${NC}"
+    echo -e "${YELLOW}  export MACOS_APPLE_ID=\"your@email.com\"${NC}"
+    echo -e "${YELLOW}  export MACOS_TEAM_ID=\"TEAM_ID\"${NC}"
+    echo -e "${YELLOW}  export MACOS_APP_SPECIFIC_PASSWORD=\"xxxx-xxxx-xxxx-xxxx\"${NC}"
+fi
+
 if [[ -z "$SIGNING_IDENTITY" ]]; then
     echo ""
-    echo -e "${YELLOW}Note: To code sign, provide a signing identity:${NC}"
-    echo -e "${YELLOW}  ./build-macos.sh ${ARCH} \"Developer ID Application: Your Name (TEAM_ID)\"${NC}"
-    echo ""
-    echo -e "${YELLOW}To notarize (requires Apple Developer account):${NC}"
-    echo -e "${YELLOW}  xcrun notarytool submit ${DMG_PATH} --apple-id YOUR_APPLE_ID --team-id TEAM_ID --password APP_SPECIFIC_PASSWORD --wait${NC}"
+    echo -e "${YELLOW}Note: To code sign, use one of these methods:${NC}"
+    echo -e "${YELLOW}  1. Command line: ./build-macos.sh ${ARCH} \"Developer ID Application: Your Name (TEAM_ID)\"${NC}"
+    echo -e "${YELLOW}  2. Environment: export MACOS_SIGNING_IDENTITY=\"Developer ID Application: ...\"${NC}"
+    echo -e "${YELLOW}  3. Config file: Create build-macos.config.sh (see build-macos.config.example.sh)${NC}"
 fi
 

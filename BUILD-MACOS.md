@@ -32,24 +32,55 @@ xattr -dr com.apple.quarantine LightroomBackupCleaner.app
 
 ### Build with Code Signing
 
-To code sign the app (recommended for distribution):
+To code sign the app (recommended for distribution), you have three options:
 
-1. **Get your signing identity**:
-   ```bash
-   security find-identity -v -p codesigning
-   ```
-   Look for "Developer ID Application" entries.
+#### Option 1: Local Config File (Recommended - Secure)
 
-2. **Build with signing**:
+1. **Copy the example config:**
    ```bash
-   ./build-macos.sh osx-arm64 "Developer ID Application: Your Name (TEAM_ID)"
+   cp build-macos.config.example.sh build-macos.config.sh
    ```
 
-3. **Verify signing**:
+2. **Edit `build-macos.config.sh`** with your credentials (this file is in .gitignore):
    ```bash
-   codesign --verify --verbose LightroomBackupCleaner.app
-   spctl --assess --verbose LightroomBackupCleaner.app
+   export MACOS_SIGNING_IDENTITY="Developer ID Application: Your Name (TEAM_ID)"
+   export MACOS_APPLE_ID="your@email.com"
+   export MACOS_TEAM_ID="TEAM_ID"
+   export MACOS_APP_SPECIFIC_PASSWORD="xxxx-xxxx-xxxx-xxxx"
    ```
+
+3. **Build normally:**
+   ```bash
+   ./build-macos.sh osx-arm64
+   ```
+
+The script will automatically load your credentials from the config file.
+
+#### Option 2: Environment Variables
+
+```bash
+export MACOS_SIGNING_IDENTITY="Developer ID Application: Your Name (TEAM_ID)"
+export MACOS_APPLE_ID="your@email.com"
+export MACOS_TEAM_ID="TEAM_ID"
+export MACOS_APP_SPECIFIC_PASSWORD="xxxx-xxxx-xxxx-xxxx"
+
+./build-macos.sh osx-arm64
+```
+
+#### Option 3: Command Line (Signing Only)
+
+```bash
+./build-macos.sh osx-arm64 "Developer ID Application: Your Name (TEAM_ID)"
+```
+
+**Note**: Command line only supports signing identity, not notarization credentials.
+
+### Verify Signing
+
+```bash
+codesign --verify --verbose LightroomBackupCleaner.app
+spctl --assess --verbose LightroomBackupCleaner.app
+```
 
 ## Code Signing Options
 

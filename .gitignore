@@ -33,3 +33,6 @@ packages/
 ## VS Code
 .vscode/
 
+## macOS Build Configuration (contains sensitive credentials)
+build-macos.config.sh
+
