@@ -122,3 +122,4 @@ git grep -i "your@email.com"
 6. ❌ Never commit credentials to git
 7. ❌ Never share credentials in issues or pull requests
 
+
