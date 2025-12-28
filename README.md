@@ -33,8 +33,8 @@ Download the appropriate version for your platform:
 | Platform | Download |
 |----------|----------|
 | Windows (x64) | [LightroomBackupCleaner-win.zip](https://photofactsacademy.s3.eu-west-1.amazonaws.com/LightroomBackupCleaner-win.zip) |
-| macOS (Intel) | [LightroomBackupCleaner-osx-x64.dmg]([https://photofactsacademy.s3.eu-west-1.amazonaws.com/LightroomBackupCleaner-osx-x64.zip](https://photofactsacademy.s3.eu-west-1.amazonaws.com/LrcBackupCleaner-osx-x64.dmg)) |
-| macOS (Apple Silicon) | [LightroomBackupCleaner-osx-arm64.dmg]([https://photofactsacademy.s3.eu-west-1.amazonaws.com/LightroomBackupCleaner-osx-arm64.zip](https://photofactsacademy.s3.eu-west-1.amazonaws.com/LrcBackupCleaner-osx-arm64.dmg)) |
+| macOS (Intel) | [LightroomBackupCleaner-osx-x64.dmg](https://photofactsacademy.s3.eu-west-1.amazonaws.com/LrcBackupCleaner-osx-x64.dmg) |
+| macOS (Apple Silicon) | [LightroomBackupCleaner-osx-arm64.dmg](https://photofactsacademy.s3.eu-west-1.amazonaws.com/LrcBackupCleaner-osx-arm64.dmg) |
 
 Extract and run the application. It's self-contained and requires no additional installation.
 
