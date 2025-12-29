@@ -10,7 +10,11 @@ A cross-platform application for automatically managing and cleaning up Adobe Li
 ![Avalonia](https://img.shields.io/badge/UI-Avalonia-8B44AC)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-## 📸 Features
+## 📸 Screenshot
+
+![Lightroom Backup Cleaner](Assets/lrcbackupcleaner-screencapture.jpg)
+
+## ✨ Features
 
 - **Cross-platform** - Works on Windows and macOS (Intel & Apple Silicon)
 - **Automatic detection** - Automatically finds your Lightroom backup location
@@ -125,9 +129,9 @@ When Lightroom Classic receives a major version update, Adobe automatically crea
 
 This helps you clean up old catalog files after a successful update.
 
-## 🎨 Screenshot
+## 🎨 Theme
 
-The application has a dark theme inspired by Adobe Lightroom Classic:
+The application features a dark theme inspired by Adobe Lightroom Classic:
 
 - Dark background (#121212)
 - Accent color blue (#0EA5E9)

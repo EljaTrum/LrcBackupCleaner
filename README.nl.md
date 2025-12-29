@@ -10,7 +10,11 @@ Een cross-platform applicatie voor het automatisch beheren en opruimen van Adobe
 ![Avalonia](https://img.shields.io/badge/UI-Avalonia-8B44AC)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-## 📸 Functionaliteiten
+## 📸 Screenshot
+
+![Lightroom Backup Cleaner](Assets/lrcbackupcleaner-screencapture.jpg)
+
+## ✨ Functionaliteiten
 
 - **Cross-platform** - Werkt op Windows en macOS (Intel & Apple Silicon)
 - **Automatische detectie** - Vindt automatisch je Lightroom backup locatie
@@ -125,7 +129,7 @@ Wanneer Lightroom Classic een grote versie-update krijgt, maakt Adobe automatisc
 
 Dit helpt je om na een succesvolle update de oude catalogusbestanden op te ruimen.
 
-## 🎨 Screenshot
+## 🎨 Thema
 
 De applicatie heeft een donker thema geïnspireerd door Adobe Lightroom Classic:
 
