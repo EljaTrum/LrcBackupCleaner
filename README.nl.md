@@ -216,6 +216,8 @@ MIT License - zie [LICENSE.md](LICENSE.md)
 
 Gemaakt door **[Photofacts Academy](https://photofactsacademy.nl)**
 
+<a href="https://www.buymeacoffee.com/eljatrum" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
 ## 🙏 Bijdragen
 
 Bijdragen zijn welkom! Open een issue of pull request.
