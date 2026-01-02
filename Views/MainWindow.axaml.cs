@@ -584,12 +584,117 @@ public partial class MainWindow : Window
         
         if (result)
         {
-            var (deleted, freed, errors) = BackupService.DeleteBackups(backupsToDelete);
+            btnCleanup.IsEnabled = false;
+            txtStatus.Text = LocalizationService.GetString("DeletingBackups");
             
-            txtStatus.Text = LocalizationService.GetString("CleanupCompleteMessage", deleted, FormatBytes(freed));
+            var (deleted, freed, errors) = await Task.Run(() => BackupService.DeleteBackups(backupsToDelete));
             
+            if (errors.Any())
+            {
+                // Er waren fouten bij het verwijderen
+                var errorMessage = LocalizationService.GetString("CleanupCompleteWithErrorsMessage", 
+                    deleted, FormatBytes(freed), errors.Count);
+                
+                // Voeg de eerste paar foutmeldingen toe (max 5 voor leesbaarheid)
+                var errorDetails = string.Join("\n", errors.Take(5));
+                if (errors.Count > 5)
+                {
+                    errorDetails += $"\n... (+{errors.Count - 5} {LocalizationService.GetString("MoreErrors")})";
+                }
+                
+                var fullMessage = errorMessage + "\n\n" + errorDetails;
+                
+                // Log alle errors naar het log bestand
+                LogCleanupErrors(errors);
+                
+                // Toon foutmelding aan gebruiker
+                await ShowErrorDialogAsync(
+                    LocalizationService.GetString("CleanupCompleteWithErrorsTitle"), 
+                    fullMessage);
+                
+                txtStatus.Text = LocalizationService.GetString("CleanupCompletedWithErrors", deleted, errors.Count);
+            }
+            else if (deleted == 0 && backupsToDelete.Any())
+            {
+                // Geen enkele backup verwijderd terwijl er wel geselecteerd waren
+                var message = LocalizationService.GetString("NoBackupsDeleted");
+                await ShowErrorDialogAsync(LocalizationService.GetString("Error"), message);
+                txtStatus.Text = LocalizationService.GetString("CleanupFailed");
+            }
+            else
+            {
+                txtStatus.Text = LocalizationService.GetString("CleanupCompleteMessage", deleted, FormatBytes(freed));
+            }
+            
+            btnCleanup.IsEnabled = true;
             await ScanBackupsAsync();
         }
+    }
+
+    private static void LogCleanupErrors(List<string> errors)
+    {
+        try
+        {
+            var logPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "LightroomBackupCleaner",
+                "cleanup-errors.log");
+            
+            var directory = Path.GetDirectoryName(logPath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            
+            var logLines = $"\n--- {DateTime.Now:yyyy-MM-dd HH:mm:ss} ---\n" + 
+                           string.Join("\n", errors) + "\n";
+            File.AppendAllText(logPath, logLines);
+        }
+        catch
+        {
+            // Ignore logging errors
+        }
+    }
+
+    private async Task ShowErrorDialogAsync(string title, string message)
+    {
+        var dialog = new Window
+        {
+            Title = title,
+            Width = 500,
+            Height = 300,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            CanResize = false,
+            Icon = IconGenerator.CreateWindowIcon()
+        };
+        
+        var panel = new StackPanel
+        {
+            Margin = new Thickness(20),
+            Spacing = 15
+        };
+        
+        var textBlock = new TextBlock
+        {
+            Text = message,
+            TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+            FontSize = 13
+        };
+        
+        var button = new Button
+        {
+            Content = LocalizationService.GetString("Close"),
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+            Padding = new Thickness(20, 8)
+        };
+        button.Click += (s, e) => dialog.Close();
+        
+        panel.Children.Add(textBlock);
+        panel.Children.Add(button);
+        
+        dialog.Content = panel;
+        
+        await dialog.ShowDialog(this);
     }
 
     private void BtnDecreaseMinAge_Click(object? sender, RoutedEventArgs e)

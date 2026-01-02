@@ -286,6 +286,28 @@ Pas de instellingen aan (meer backups bewaren of kortere minimale leeftijd) als 
 
 Er waren {2} fouten:</value>
   </data>
+  <data name="DeletingBackups" xml:space="preserve">
+    <value>Backups verwijderen...</value>
+  </data>
+  <data name="MoreErrors" xml:space="preserve">
+    <value>meer fouten</value>
+  </data>
+  <data name="CleanupCompletedWithErrors" xml:space="preserve">
+    <value>{0} backup(s) verwijderd, {1} fout(en) opgetreden</value>
+  </data>
+  <data name="NoBackupsDeleted" xml:space="preserve">
+    <value>Geen enkele backup kon worden verwijderd. Dit kan komen door:
+
+• Bestanden zijn in gebruik door een ander programma (bijv. Lightroom)
+• Onvoldoende rechten om de map te verwijderen
+• De backup map wordt beschermd door antivirussoftware
+• Het bestandspad is te lang (Windows beperking)
+
+Probeer Lightroom en andere programma's die de backup bestanden mogelijk open hebben te sluiten en probeer het opnieuw.</value>
+  </data>
+  <data name="CleanupFailed" xml:space="preserve">
+    <value>Opruimen mislukt - geen backups verwijderd</value>
+  </data>
   <data name="InvalidBackupFolder" xml:space="preserve">
     <value>Ongeldige backup map</value>
   </data>

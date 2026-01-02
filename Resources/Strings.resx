@@ -286,6 +286,28 @@ Adjust the settings (keep more backups or shorter minimum age) if you want to de
 
 There were {2} errors:</value>
   </data>
+  <data name="DeletingBackups" xml:space="preserve">
+    <value>Deleting backups...</value>
+  </data>
+  <data name="MoreErrors" xml:space="preserve">
+    <value>more errors</value>
+  </data>
+  <data name="CleanupCompletedWithErrors" xml:space="preserve">
+    <value>{0} backup(s) deleted, {1} error(s) occurred</value>
+  </data>
+  <data name="NoBackupsDeleted" xml:space="preserve">
+    <value>No backups could be deleted. This may be caused by:
+
+• Files are in use by another program (e.g. Lightroom)
+• Insufficient permissions to delete the folder
+• The backup folder is protected by antivirus software
+• The file path is too long (Windows limitation)
+
+Try closing Lightroom and any programs that may have the backup files open, then try again.</value>
+  </data>
+  <data name="CleanupFailed" xml:space="preserve">
+    <value>Cleanup failed - no backups were deleted</value>
+  </data>
   <data name="InvalidBackupFolder" xml:space="preserve">
     <value>Invalid backup folder</value>
   </data>
