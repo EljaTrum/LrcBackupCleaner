@@ -125,7 +125,28 @@ public partial class MainWindow : Window
         searchingState.IsVisible = true;
         emptyState.IsVisible = false;
 
+        // Stap 1: Snelle zoektocht op standaard locaties
         var foundLocations = await Task.Run(() => LightroomDetectionService.FindBackupLocations());
+
+        // Stap 2: Als niets gevonden, diepe scan met progress reporting
+        if (!foundLocations.Any())
+        {
+            txtStatus.Text = LocalizationService.GetString("DeepSearching");
+            
+            var cts = new System.Threading.CancellationTokenSource();
+            
+            foundLocations = await Task.Run(() => 
+                LightroomDetectionService.DeepScanForBackupLocationsWithProgress(
+                    progress => Dispatcher.UIThread.Post(() => 
+                    {
+                        UpdateStatus(progress, progress); // Tooltip met volledige tekst voor lange paden
+                    }),
+                    cts.Token
+                ));
+            
+            // Wis de tooltip na het zoeken
+            Avalonia.Controls.ToolTip.SetTip(txtStatus, null);
+        }
 
         searchingState.IsVisible = false;
 
@@ -188,11 +209,17 @@ public partial class MainWindow : Window
         {
             var catalogName = _settings.CatalogName ?? 
                 LightroomDetectionService.GetCatalogNameFromBackupPath(_settings.BackupFolderPath);
-            txtCatalogInfo.Text = $"{catalogName} • {_settings.BackupFolderPath}";
+            var displayText = $"{catalogName} • {_settings.BackupFolderPath}";
+            txtCatalogInfo.Text = displayText;
+            
+            // Tooltip met volledige tekst voor lange paden
+            Avalonia.Controls.ToolTip.SetTip(txtCatalogInfo, 
+                $"{catalogName}\n{_settings.BackupFolderPath}\n\n{LocalizationService.GetString("OpenFolderTooltip")}");
         }
         else
         {
             txtCatalogInfo.Text = LocalizationService.GetString("NoCatalogSelected");
+            Avalonia.Controls.ToolTip.SetTip(txtCatalogInfo, null);
         }
     }
 
@@ -476,6 +503,25 @@ public partial class MainWindow : Window
         settingsWindow.LanguageChanged += (s, newLanguage) =>
         {
             SaveSettings();
+        };
+        
+        settingsWindow.ForgetFolderRequested += async (s, args) =>
+        {
+            // Reset de UI
+            _backups.Clear();
+            txtCatalogInfo.Text = LocalizationService.GetString("NoCatalogSelected");
+            oldCatalogsAlert.IsVisible = false;
+            
+            // Reset statistieken
+            txtTotalBackups.Text = "0 backup(s)";
+            txtToDelete.Text = "0";
+            txtSpaceToFree.Text = "0 B";
+            
+            // Herlaad settings (folder is al null gezet door SettingsWindow)
+            LoadSettings();
+            
+            // Start de detectie opnieuw
+            await InitializeBackupLocationAsync();
         };
         
         await settingsWindow.ShowDialog(this);
@@ -785,6 +831,15 @@ public partial class MainWindow : Window
             len /= 1024;
         }
         return $"{len:0.##} {sizes[order]}";
+    }
+
+    /// <summary>
+    /// Update de statusbalk tekst en tooltip
+    /// </summary>
+    private void UpdateStatus(string text, string? tooltip = null)
+    {
+        txtStatus.Text = text;
+        Avalonia.Controls.ToolTip.SetTip(txtStatus, tooltip);
     }
 
     private void PhotofactsLink_Click(object? sender, PointerPressedEventArgs e)

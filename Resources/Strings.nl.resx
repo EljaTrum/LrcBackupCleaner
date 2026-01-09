@@ -125,6 +125,30 @@
   <data name="SearchingBackups" xml:space="preserve">
     <value>Zoeken naar Lightroom backups...</value>
   </data>
+  <data name="DeepSearching" xml:space="preserve">
+    <value>Alle schijven doorzoeken naar Lightroom backups...</value>
+  </data>
+  <data name="SearchingOnDrive" xml:space="preserve">
+    <value>Zoeken op {0} {1}...</value>
+  </data>
+  <data name="SearchingInFolder" xml:space="preserve">
+    <value>Zoeken in {0}...</value>
+  </data>
+  <data name="DriveTypeNetwork" xml:space="preserve">
+    <value>(netwerk)</value>
+  </data>
+  <data name="DriveTypeExternal" xml:space="preserve">
+    <value>(extern)</value>
+  </data>
+  <data name="DriveTypeMapped" xml:space="preserve">
+    <value>(gemapt)</value>
+  </data>
+  <data name="FoundBackup" xml:space="preserve">
+    <value>Gevonden: {0}</value>
+  </data>
+  <data name="FoundCatalog" xml:space="preserve">
+    <value>Catalogus gevonden: {0}</value>
+  </data>
 
   <!-- Age Formatting -->
   <data name="Today" xml:space="preserve">
@@ -211,6 +235,22 @@
   </data>
   <data name="LanguageDutch" xml:space="preserve">
     <value>Nederlands</value>
+  </data>
+
+  <data name="ForgetFolderTitle" xml:space="preserve">
+    <value>🔄 Backup locatie opnieuw detecteren</value>
+  </data>
+  <data name="ForgetFolderDescription" xml:space="preserve">
+    <value>Vergeet de huidige backup locatie en zoek opnieuw naar Lightroom backups op alle schijven. Handig als je meerdere Lightroom catalogi hebt of de backup map hebt verplaatst.</value>
+  </data>
+  <data name="ForgetFolderButton" xml:space="preserve">
+    <value>🔄 Backup locatie vergeten</value>
+  </data>
+  <data name="CurrentLocation" xml:space="preserve">
+    <value>Huidige locatie:</value>
+  </data>
+  <data name="NoLocationSet" xml:space="preserve">
+    <value>Geen ingesteld</value>
   </data>
 
   <data name="AboutTitle" xml:space="preserve">

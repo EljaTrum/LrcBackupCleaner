@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace BackupCleaner.Services
 {
@@ -19,14 +20,24 @@ namespace BackupCleaner.Services
             @"^(\d{4})-(\d{2})-(\d{2})\s+(\d{4})$",
             RegexOptions.Compiled);
 
+        // Mappen om over te slaan bij diepe zoekopdrachten (performance)
+        private static readonly HashSet<string> SkipFolderNames = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Windows", "Program Files", "Program Files (x86)", "$Recycle.Bin", "System Volume Information",
+            "Recovery", "ProgramData", "node_modules", ".git", ".svn", "AppData", "Application Data",
+            "Temp", "tmp", "Cache", "Caches", ".Trash", ".Spotlight-V100", ".fseventsd",
+            "OneDriveTemp", "Dropbox.cache", "Google Drive", "iCloud Drive"
+        };
+
         /// <summary>
-        /// Zoek automatisch naar Lightroom backup locaties
+        /// Snelle zoektocht naar Lightroom backup locaties op standaard paden.
+        /// Roept NIET automatisch de diepe scan aan - dit moet apart gedaan worden.
         /// </summary>
         public static List<string> FindBackupLocations()
         {
             var foundLocations = new List<string>();
             
-            // Standaard Lightroom catalogus locaties om te doorzoeken
+            // Zoek alleen op standaard Lightroom catalogus locaties
             var searchPaths = GetPotentialCatalogPaths();
             
             foreach (var searchPath in searchPaths)
@@ -36,7 +47,6 @@ namespace BackupCleaner.Services
 
                 try
                 {
-                    // Zoek naar "Backups" mappen
                     var backupFolders = FindBackupFoldersInPath(searchPath);
                     foundLocations.AddRange(backupFolders);
                 }
@@ -47,6 +57,324 @@ namespace BackupCleaner.Services
             }
 
             return foundLocations.Distinct().ToList();
+        }
+
+        /// <summary>
+        /// Diepe scan op alle schijven naar Lightroom backup locaties.
+        /// Zoekt naar .lrcat bestanden en Backups mappen met datum-submappen.
+        /// Doorzoekt vaste schijven, externe drives en netwerkdrives.
+        /// </summary>
+        public static List<string> DeepScanForBackupLocations(CancellationToken cancellationToken = default)
+        {
+            var foundLocations = new HashSet<string>();
+            var catalogLocations = new HashSet<string>();
+            var scannedDrives = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            
+            // Zoek op alle beschikbare schijven (Fixed, Removable, Network)
+            foreach (var drive in DriveInfo.GetDrives())
+            {
+                if (cancellationToken.IsCancellationRequested) break;
+                
+                // Ondersteun vaste schijven, externe drives (USB) en netwerkdrives
+                var supportedTypes = new[] { DriveType.Fixed, DriveType.Removable, DriveType.Network };
+                
+                if (supportedTypes.Contains(drive.DriveType) && drive.IsReady)
+                {
+                    try
+                    {
+                        scannedDrives.Add(drive.Name);
+                        // Zoek naar .lrcat bestanden en Backups mappen
+                        // Gebruik diepte 6 voor alle drives (netwerk drives kunnen diepere structuren hebben)
+                        DeepScanDirectory(drive.RootDirectory.FullName, 0, 6, foundLocations, catalogLocations, cancellationToken);
+                    }
+                    catch
+                    {
+                        // Schijf-niveau fout - doorgaan naar volgende schijf
+                    }
+                }
+            }
+            
+            // Extra: Scan alle gemapte drive letters (A-Z) die mogelijk niet in DriveInfo staan
+            // Dit vangt gemapte netwerkdrives op die soms niet correct worden gedetecteerd
+            for (char driveLetter = 'A'; driveLetter <= 'Z'; driveLetter++)
+            {
+                if (cancellationToken.IsCancellationRequested) break;
+                
+                var drivePath = $"{driveLetter}:\\";
+                if (scannedDrives.Contains(drivePath)) continue;
+                
+                try
+                {
+                    if (Directory.Exists(drivePath))
+                    {
+                        DeepScanDirectory(drivePath, 0, 6, foundLocations, catalogLocations, cancellationToken);
+                    }
+                }
+                catch
+                {
+                    // Drive niet toegankelijk - doorgaan
+                }
+            }
+
+            // Voor gevonden catalogi, zoek ook Backups mappen in de buurt
+            foreach (var catalogPath in catalogLocations)
+            {
+                if (cancellationToken.IsCancellationRequested) break;
+                
+                try
+                {
+                    var catalogDir = Path.GetDirectoryName(catalogPath);
+                    if (string.IsNullOrEmpty(catalogDir)) continue;
+
+                    // Check Backups submap
+                    var backupsDir = Path.Combine(catalogDir, "Backups");
+                    if (Directory.Exists(backupsDir) && IsValidBackupFolder(backupsDir))
+                    {
+                        foundLocations.Add(backupsDir);
+                    }
+
+                    // Check ook parent directory voor Backups map (soms staat catalogus in submap)
+                    var parentDir = Directory.GetParent(catalogDir)?.FullName;
+                    if (!string.IsNullOrEmpty(parentDir))
+                    {
+                        var parentBackupsDir = Path.Combine(parentDir, "Backups");
+                        if (Directory.Exists(parentBackupsDir) && IsValidBackupFolder(parentBackupsDir))
+                        {
+                            foundLocations.Add(parentBackupsDir);
+                        }
+                    }
+                }
+                catch
+                {
+                    // Negeer fouten bij individuele catalogi
+                }
+            }
+
+            return foundLocations.ToList();
+        }
+
+        /// <summary>
+        /// Diepe scan met progress reporting voor UI feedback.
+        /// Doorzoekt vaste schijven, externe drives en netwerkdrives.
+        /// </summary>
+        public static List<string> DeepScanForBackupLocationsWithProgress(
+            Action<string>? progressCallback,
+            CancellationToken cancellationToken = default)
+        {
+            var foundLocations = new HashSet<string>();
+            var catalogLocations = new HashSet<string>();
+            var scannedDrives = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            
+            foreach (var drive in DriveInfo.GetDrives())
+            {
+                if (cancellationToken.IsCancellationRequested) break;
+                
+                // Ondersteun vaste schijven, externe drives (USB) en netwerkdrives
+                var supportedTypes = new[] { DriveType.Fixed, DriveType.Removable, DriveType.Network };
+                
+                if (supportedTypes.Contains(drive.DriveType) && drive.IsReady)
+                {
+                    try
+                    {
+                        scannedDrives.Add(drive.Name);
+                        
+                        // Toon drive type in progress (vertaald)
+                        var driveTypeText = drive.DriveType switch
+                        {
+                            DriveType.Network => LocalizationService.GetString("DriveTypeNetwork"),
+                            DriveType.Removable => LocalizationService.GetString("DriveTypeExternal"),
+                            _ => ""
+                        };
+                        progressCallback?.Invoke(LocalizationService.GetString("SearchingOnDrive", drive.Name, driveTypeText).Trim());
+                        
+                        // Gebruik diepte 6 voor alle drives
+                        DeepScanDirectoryWithProgress(drive.RootDirectory.FullName, 0, 6, 
+                            foundLocations, catalogLocations, progressCallback, cancellationToken);
+                    }
+                    catch
+                    {
+                        // Schijf-niveau fout - doorgaan
+                    }
+                }
+            }
+            
+            // Extra: Scan alle gemapte drive letters (A-Z) die mogelijk niet in DriveInfo staan
+            for (char driveLetter = 'A'; driveLetter <= 'Z'; driveLetter++)
+            {
+                if (cancellationToken.IsCancellationRequested) break;
+                
+                var drivePath = $"{driveLetter}:\\";
+                if (scannedDrives.Contains(drivePath)) continue;
+                
+                try
+                {
+                    if (Directory.Exists(drivePath))
+                    {
+                        progressCallback?.Invoke(LocalizationService.GetString("SearchingOnDrive", drivePath, LocalizationService.GetString("DriveTypeMapped")));
+                        DeepScanDirectoryWithProgress(drivePath, 0, 6, 
+                            foundLocations, catalogLocations, progressCallback, cancellationToken);
+                    }
+                }
+                catch
+                {
+                    // Drive niet toegankelijk - doorgaan
+                }
+            }
+
+            // Zoek Backups mappen bij gevonden catalogi
+            foreach (var catalogPath in catalogLocations)
+            {
+                if (cancellationToken.IsCancellationRequested) break;
+                
+                try
+                {
+                    var catalogDir = Path.GetDirectoryName(catalogPath);
+                    if (string.IsNullOrEmpty(catalogDir)) continue;
+
+                    var backupsDir = Path.Combine(catalogDir, "Backups");
+                    if (Directory.Exists(backupsDir) && IsValidBackupFolder(backupsDir))
+                    {
+                        foundLocations.Add(backupsDir);
+                    }
+
+                    var parentDir = Directory.GetParent(catalogDir)?.FullName;
+                    if (!string.IsNullOrEmpty(parentDir))
+                    {
+                        var parentBackupsDir = Path.Combine(parentDir, "Backups");
+                        if (Directory.Exists(parentBackupsDir) && IsValidBackupFolder(parentBackupsDir))
+                        {
+                            foundLocations.Add(parentBackupsDir);
+                        }
+                    }
+                }
+                catch
+                {
+                    // Negeer fouten
+                }
+            }
+
+            return foundLocations.ToList();
+        }
+
+        /// <summary>
+        /// Recursieve diepe scan met progress callback
+        /// </summary>
+        private static void DeepScanDirectoryWithProgress(string path, int depth, int maxDepth,
+            HashSet<string> foundBackups, HashSet<string> foundCatalogs,
+            Action<string>? progressCallback, CancellationToken cancellationToken)
+        {
+            if (depth > maxDepth || cancellationToken.IsCancellationRequested)
+                return;
+
+            try
+            {
+                var dirName = Path.GetFileName(path);
+                
+                if (SkipFolderNames.Contains(dirName))
+                    return;
+
+                // Progress rapportage - toon altijd de huidige map
+                progressCallback?.Invoke(LocalizationService.GetString("SearchingInFolder", path));
+
+                if (dirName.Equals("Backups", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (IsValidBackupFolder(path))
+                    {
+                        foundBackups.Add(path);
+                        progressCallback?.Invoke(LocalizationService.GetString("FoundBackup", path));
+                    }
+                    return;
+                }
+
+                try
+                {
+                    foreach (var file in Directory.EnumerateFiles(path, "*.lrcat", SearchOption.TopDirectoryOnly))
+                    {
+                        if (!IsBackupDateFolder(dirName))
+                        {
+                            foundCatalogs.Add(file);
+                            progressCallback?.Invoke(LocalizationService.GetString("FoundCatalog", file));
+                        }
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    foreach (var subDir in Directory.EnumerateDirectories(path))
+                    {
+                        if (cancellationToken.IsCancellationRequested) break;
+                        DeepScanDirectoryWithProgress(subDir, depth + 1, maxDepth, 
+                            foundBackups, foundCatalogs, progressCallback, cancellationToken);
+                    }
+                }
+                catch { }
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// Recursieve diepe scan van een directory
+        /// </summary>
+        private static void DeepScanDirectory(string path, int depth, int maxDepth, 
+            HashSet<string> foundBackups, HashSet<string> foundCatalogs, CancellationToken cancellationToken)
+        {
+            if (depth > maxDepth || cancellationToken.IsCancellationRequested)
+                return;
+
+            try
+            {
+                var dirName = Path.GetFileName(path);
+                
+                // Skip systeem- en tijdelijke mappen
+                if (SkipFolderNames.Contains(dirName))
+                    return;
+
+                // Check of dit een "Backups" map is met geldige Lightroom backups
+                if (dirName.Equals("Backups", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (IsValidBackupFolder(path))
+                    {
+                        foundBackups.Add(path);
+                    }
+                    return; // Niet verder zoeken binnen Backups map
+                }
+
+                // Check voor .lrcat bestanden (Lightroom catalogi)
+                try
+                {
+                    foreach (var file in Directory.EnumerateFiles(path, "*.lrcat", SearchOption.TopDirectoryOnly))
+                    {
+                        // Filter out backup .lrcat bestanden (die staan in datum-mappen)
+                        if (!IsBackupDateFolder(dirName))
+                        {
+                            foundCatalogs.Add(file);
+                        }
+                    }
+                }
+                catch
+                {
+                    // Kan bestanden niet lezen - doorgaan
+                }
+
+                // Recursief subdirectories doorzoeken
+                try
+                {
+                    foreach (var subDir in Directory.EnumerateDirectories(path))
+                    {
+                        if (cancellationToken.IsCancellationRequested) break;
+                        DeepScanDirectory(subDir, depth + 1, maxDepth, foundBackups, foundCatalogs, cancellationToken);
+                    }
+                }
+                catch
+                {
+                    // Kan subdirectories niet lezen - doorgaan
+                }
+            }
+            catch
+            {
+                // Toegangsfout - negeren
+            }
         }
 
         /// <summary>

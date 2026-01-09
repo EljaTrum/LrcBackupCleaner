@@ -125,6 +125,30 @@
   <data name="SearchingBackups" xml:space="preserve">
     <value>Searching for Lightroom backups...</value>
   </data>
+  <data name="DeepSearching" xml:space="preserve">
+    <value>Deep searching all drives for Lightroom backups...</value>
+  </data>
+  <data name="SearchingOnDrive" xml:space="preserve">
+    <value>Searching on {0} {1}...</value>
+  </data>
+  <data name="SearchingInFolder" xml:space="preserve">
+    <value>Searching in {0}...</value>
+  </data>
+  <data name="DriveTypeNetwork" xml:space="preserve">
+    <value>(network)</value>
+  </data>
+  <data name="DriveTypeExternal" xml:space="preserve">
+    <value>(external)</value>
+  </data>
+  <data name="DriveTypeMapped" xml:space="preserve">
+    <value>(mapped)</value>
+  </data>
+  <data name="FoundBackup" xml:space="preserve">
+    <value>Found: {0}</value>
+  </data>
+  <data name="FoundCatalog" xml:space="preserve">
+    <value>Catalog found: {0}</value>
+  </data>
 
   <!-- Age Formatting -->
   <data name="Today" xml:space="preserve">
@@ -211,6 +235,22 @@
   </data>
   <data name="LanguageDutch" xml:space="preserve">
     <value>Nederlands</value>
+  </data>
+
+  <data name="ForgetFolderTitle" xml:space="preserve">
+    <value>🔄 Re-detect backup location</value>
+  </data>
+  <data name="ForgetFolderDescription" xml:space="preserve">
+    <value>Forget the current backup location and search again for Lightroom backups on all drives. Useful if you have multiple Lightroom catalogs or have moved the backup folder.</value>
+  </data>
+  <data name="ForgetFolderButton" xml:space="preserve">
+    <value>🔄 Forget backup location</value>
+  </data>
+  <data name="CurrentLocation" xml:space="preserve">
+    <value>Current location:</value>
+  </data>
+  <data name="NoLocationSet" xml:space="preserve">
+    <value>None set</value>
   </data>
 
   <data name="AboutTitle" xml:space="preserve">

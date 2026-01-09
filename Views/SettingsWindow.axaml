@@ -179,6 +179,37 @@
                     </StackPanel>
                 </Border>
 
+                <!-- Backup locatie vergeten sectie -->
+                <Border Classes="card">
+                    <StackPanel>
+                        <TextBlock x:Name="txtForgetFolderTitle" 
+                                   Text="🔄 Backup locatie opnieuw detecteren" 
+                                   FontSize="16" 
+                                   FontWeight="SemiBold" 
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,8"/>
+                        
+                        <TextBlock x:Name="txtForgetFolderDescription" 
+                                   Text="Vergeet de huidige backup locatie en zoek opnieuw naar Lightroom backups op alle schijven. Handig als je meerdere Lightroom catalogi hebt of de backup map hebt verplaatst." 
+                                   TextWrapping="Wrap"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,16"/>
+                        
+                        <TextBlock x:Name="txtCurrentFolder" 
+                                   Text="Huidige locatie: -" 
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="12"
+                                   Margin="0,0,0,12"
+                                   TextTrimming="CharacterEllipsis"/>
+                        
+                        <Button x:Name="btnForgetFolder"
+                                Content="🔄 Backup locatie vergeten"
+                                Click="BtnForgetFolder_Click"
+                                Classes="secondary"
+                                HorizontalAlignment="Left"/>
+                    </StackPanel>
+                </Border>
+
                 <!-- Over sectie -->
                 <Border Classes="card">
                     <StackPanel>

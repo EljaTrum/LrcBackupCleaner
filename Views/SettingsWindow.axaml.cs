@@ -16,6 +16,7 @@ public partial class SettingsWindow : Window
     public event EventHandler? AutoCleanupChanged;
     public event EventHandler? RunAtStartupChanged;
     public event EventHandler<string>? LanguageChanged;
+    public event EventHandler? ForgetFolderRequested;
 
     public SettingsWindow() : this(new AppSettings()) { }
 
@@ -49,9 +50,23 @@ public partial class SettingsWindow : Window
         UpdateCleanupHourDisplay();
         UpdateAutoCleanupInfo();
         UpdateStartupInfo();
+        UpdateCurrentFolderDisplay();
         ApplyLocalization();
         
         _isInitialized = true;
+    }
+    
+    private void UpdateCurrentFolderDisplay()
+    {
+        var label = LocalizationService.GetString("CurrentLocation");
+        if (!string.IsNullOrEmpty(_settings.BackupFolderPath))
+        {
+            txtCurrentFolder.Text = $"{label} {_settings.BackupFolderPath}";
+        }
+        else
+        {
+            txtCurrentFolder.Text = $"{label} {LocalizationService.GetString("NoLocationSet")}";
+        }
     }
     
     private void ApplyLocalization()
@@ -72,6 +87,10 @@ public partial class SettingsWindow : Window
         txtLanguageTitle.Text = LocalizationService.GetString("LanguageTitle");
         txtLanguageDescription.Text = LocalizationService.GetString("LanguageDescription");
         txtLangAuto.Text = LocalizationService.GetString("LanguageAuto");
+        
+        txtForgetFolderTitle.Text = LocalizationService.GetString("ForgetFolderTitle");
+        txtForgetFolderDescription.Text = LocalizationService.GetString("ForgetFolderDescription");
+        btnForgetFolder.Content = LocalizationService.GetString("ForgetFolderButton");
         
         txtAboutTitle.Text = LocalizationService.GetString("AboutTitle");
         txtAboutDescription1.Text = LocalizationService.GetString("AboutDescription1");
@@ -221,6 +240,22 @@ public partial class SettingsWindow : Window
             
             LanguageChanged?.Invoke(this, newLanguage);
         }
+    }
+    
+    private void BtnForgetFolder_Click(object? sender, RoutedEventArgs e)
+    {
+        // Reset de backup folder in settings
+        _settings.BackupFolderPath = null;
+        _settings.CatalogName = null;
+        SettingsService.Save(_settings);
+        
+        UpdateCurrentFolderDisplay();
+        
+        // Trigger event zodat MainWindow de detectie opnieuw kan starten
+        ForgetFolderRequested?.Invoke(this, EventArgs.Empty);
+        
+        // Sluit het settings venster
+        Close();
     }
 }
 
